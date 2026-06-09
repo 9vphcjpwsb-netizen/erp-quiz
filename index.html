@@ -182,7 +182,7 @@
 
     .mode-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -229,7 +229,8 @@
       align-items: center;
     }
 
-    input[type="number"] {
+    input[type="number"],
+    input[type="text"] {
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -238,7 +239,8 @@
       outline: none;
     }
 
-    input[type="number"]:focus {
+    input[type="number"]:focus,
+    input[type="text"]:focus {
       border-color: rgba(68, 64, 60, 0.45);
       box-shadow: 0 0 0 4px rgba(68,64,60,0.08);
     }
@@ -248,6 +250,12 @@
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 12px;
+    }
+
+    .range-panel {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
     }
 
     .pill {
@@ -703,6 +711,15 @@
                 <strong>依題號順序</strong>
                 <span>按照題號由小到大，並跳過已掌握題目。</span>
               </button>
+              <button class="choice-btn" data-mode="range" id="modeRange" type="button">
+                <strong>指定題號區間</strong>
+                <span>輸入像 1-10，已掌握題目也會出現。</span>
+              </button>
+            </div>
+            <div class="range-panel hidden" id="rangePanel">
+              <label class="field-label" for="questionRange">指定題號區間</label>
+              <input id="questionRange" type="text" inputmode="text" placeholder="例如：1-10" />
+              <p class="note">指定區間不會跳過已掌握題目；答錯仍會把該題連續答對次數清零。</p>
             </div>
           </div>
 
@@ -720,7 +737,7 @@
               <button class="pill" type="button" data-count="100">100 題</button>
               <button class="pill" type="button" id="allRemainingBtn">全部可練習</button>
             </div>
-            <p class="note">每 10 題顯示一頁；交卷後才會顯示答案。</p>
+            <p class="note" id="countNote">每 10 題顯示一頁；交卷後才會顯示答案。</p>
           </div>
         </div>
 
@@ -6058,21 +6075,69 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    function modeLabel(mode) {
+      if (mode === "random") return "隨機抽題";
+      if (mode === "order") return "依題號順序";
+      if (mode === "range") return "指定題號區間";
+      return "測驗";
+    }
+
+    function updateModeUI() {
+      const isRange = selectedMode === "range";
+      const rangePanel = $("rangePanel");
+      if (rangePanel) rangePanel.classList.toggle("hidden", !isRange);
+      const countNote = $("countNote");
+      if (countNote) {
+        countNote.textContent = isRange
+          ? "指定題號區間會忽略本次題數，直接使用你輸入的範圍。"
+          : "每 10 題顯示一頁；交卷後才會顯示答案。";
+      }
+    }
+
+    function parseQuestionRange(raw) {
+      const text = String(raw || "").trim();
+      const match = text.match(/^(\d+)\s*-\s*(\d+)$/);
+      if (!match) return null;
+      let start = Number(match[1]);
+      let end = Number(match[2]);
+      if (!Number.isInteger(start) || !Number.isInteger(end)) return null;
+      if (start <= 0 || end <= 0) return null;
+      if (start > end) [start, end] = [end, start];
+      return { start, end };
+    }
+
     function startQuiz() {
       const store = loadStore();
-      const pool = eligibleQuestions(store);
-      if (pool.length === 0) {
-        alert("你已經把全部題目都連續答對 3 次了！想重新練習的話，可以按「重置全部進度」。");
-        return;
+      let picked = [];
+
+      if (selectedMode === "range") {
+        const parsed = parseQuestionRange($("questionRange").value);
+        if (!parsed) {
+          alert("請輸入指定題號區間，例如：1-10");
+          return;
+        }
+        picked = QUESTIONS
+          .filter(q => q.id >= parsed.start && q.id <= parsed.end)
+          .sort((a, b) => a.id - b.id);
+        if (picked.length === 0) {
+          alert(`找不到題號 ${parsed.start}-${parsed.end} 的題目。`);
+          return;
+        }
+      } else {
+        const pool = eligibleQuestions(store);
+        if (pool.length === 0) {
+          alert("你已經把全部題目都連續答對 3 次了！想重新練習的話，可以按「重置全部進度」，或使用「指定題號區間」練已掌握題目。");
+          return;
+        }
+
+        let count = parseInt($("questionCount").value, 10);
+        if (!Number.isFinite(count) || count <= 0) count = 30;
+        count = Math.min(count, pool.length);
+
+        picked = selectedMode === "random"
+          ? shuffle(pool).slice(0, count)
+          : [...pool].sort((a, b) => a.id - b.id).slice(0, count);
       }
-
-      let count = parseInt($("questionCount").value, 10);
-      if (!Number.isFinite(count) || count <= 0) count = 30;
-      count = Math.min(count, pool.length);
-
-      const picked = selectedMode === "random"
-        ? shuffle(pool).slice(0, count)
-        : [...pool].sort((a, b) => a.id - b.id).slice(0, count);
 
       currentExam = {
         mode: selectedMode,
@@ -6094,7 +6159,7 @@
       const pageQuestions = currentExam.questions.slice(start, start + PAGE_SIZE);
       const answeredCount = Object.keys(currentExam.answers).length;
 
-      $("quizTitle").textContent = selectedMode === "random" ? "隨機抽題" : "依題號順序";
+      $("quizTitle").textContent = modeLabel(currentExam.mode);
       $("quizMeta").textContent = `本次 ${total} 題 · 已作答 ${answeredCount} 題 · 第 ${currentPage + 1} / ${pageCount} 頁`;
       $("pageInfo").textContent = `目前顯示第 ${start + 1}–${Math.min(start + PAGE_SIZE, total)} 題`;
       $("prevPageBtn").disabled = currentPage === 0;
@@ -6233,7 +6298,7 @@
     function renderResult() {
       if (!lastResult) return;
       const wrong = lastResult.details.filter(d => !d.correct);
-      $("resultDate").textContent = `${lastResult.mode === "random" ? "隨機抽題" : "依題號順序"} · ${formatDate(lastResult.date)}`;
+      $("resultDate").textContent = `${modeLabel(lastResult.mode)} · ${formatDate(lastResult.date)}`;
       $("resultSummary").innerHTML = [
         resultStat("分數", `${lastResult.score} / ${lastResult.total}`),
         resultStat("答對率", `${lastResult.percent}%`),
@@ -6307,8 +6372,10 @@
           selectedMode = btn.dataset.mode;
           document.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
+          updateModeUI();
         });
       });
+      updateModeUI();
 
       document.querySelectorAll("[data-count]").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -6349,6 +6416,7 @@
       $("restartSameModeBtn").addEventListener("click", () => {
         selectedMode = lastResult?.mode || selectedMode;
         document.querySelectorAll(".choice-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === selectedMode));
+        updateModeUI();
         setView("home");
         renderDashboard();
         setTimeout(startQuiz, 80);
