@@ -1,0 +1,6427 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ERP 財務模組測驗</title>
+  <style>
+    :root {
+      --bg: #f7f7f5;
+      --card: rgba(255, 255, 255, 0.86);
+      --card-solid: #ffffff;
+      --text: #2b2b2b;
+      --muted: #737373;
+      --soft: #a3a3a3;
+      --line: rgba(38, 38, 38, 0.10);
+      --line-strong: rgba(38, 38, 38, 0.18);
+      --shadow: 0 16px 48px rgba(15, 23, 42, 0.06);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --ok: #166534;
+      --ok-bg: #ecfdf3;
+      --bad: #991b1b;
+      --bad-bg: #fff1f2;
+      --warn: #854d0e;
+      --warn-bg: #fffbeb;
+      --accent: #44403c;
+      --accent-bg: #efede9;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.98), rgba(247,247,245,0.6) 36%, transparent 62%),
+        linear-gradient(135deg, #f8f8f6 0%, #f2f1ee 100%);
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      padding: 20px 16px 44px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin: 10px 0 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 7vw, 54px);
+      line-height: 1.03;
+      letter-spacing: -0.06em;
+      color: #262626;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 720px;
+      font-size: 15px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .stat {
+      padding: 16px;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .stat .value {
+      margin-top: 12px;
+      font-size: 24px;
+      font-weight: 750;
+      letter-spacing: -0.04em;
+    }
+
+    .stat .hint {
+      margin-top: 6px;
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .section {
+      padding: 18px;
+      margin-top: 14px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -0.03em;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .control-card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.62);
+    }
+
+    .field-label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .choice-btn {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--card-solid);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
+    }
+
+    .choice-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--line-strong);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+    }
+
+    .choice-btn.active {
+      background: var(--accent-bg);
+      border-color: rgba(68, 64, 60, 0.25);
+    }
+
+    .choice-btn strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .choice-btn span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .qty-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 13px 14px;
+      background: var(--card-solid);
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: rgba(68, 64, 60, 0.45);
+      box-shadow: 0 0 0 4px rgba(68,64,60,0.08);
+    }
+
+    .quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .range-panel {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--card-solid);
+      color: var(--text);
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-size: 13px;
+    }
+
+    .pill:hover {
+      border-color: var(--line-strong);
+      transform: translateY(-1px);
+    }
+
+    .primary, .secondary, .danger {
+      border: 1px solid transparent;
+      border-radius: 16px;
+      padding: 13px 16px;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      min-height: 48px;
+      font-weight: 650;
+    }
+
+    .primary {
+      background: #2f2f2f;
+      color: #fff;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+    }
+
+    .secondary {
+      background: var(--card-solid);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    .danger {
+      background: #fff;
+      color: var(--bad);
+      border-color: rgba(153,27,27,0.18);
+    }
+
+    .danger:hover {
+      background: var(--bad-bg);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .progress-wrap {
+      margin-top: 10px;
+      height: 10px;
+      background: rgba(38,38,38,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #525252, #a8a29e);
+      border-radius: 999px;
+      transition: width .35s ease;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .quiz-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: -20px -16px 16px;
+      padding: 12px 16px;
+      background: rgba(247,247,245,0.88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-dots {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 4px 0;
+    }
+
+    .page-dot {
+      min-width: 38px;
+      height: 36px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--card-solid);
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .page-dot.active {
+      background: #2f2f2f;
+      color: #fff;
+      border-color: #2f2f2f;
+    }
+
+    .quiz-meta {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .questions-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .question-card {
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--card-solid);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.035);
+      scroll-margin-top: 88px;
+    }
+
+    .q-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .q-title {
+      font-size: 16px;
+      line-height: 1.75;
+      margin-bottom: 13px;
+      color: #262626;
+      white-space: pre-line;
+    }
+
+    .options {
+      display: grid;
+      gap: 9px;
+    }
+
+    .option {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      align-items: start;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: #fff;
+      cursor: pointer;
+      line-height: 1.55;
+      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+
+    .option:hover {
+      border-color: var(--line-strong);
+      transform: translateY(-1px);
+    }
+
+    .option.selected {
+      background: var(--accent-bg);
+      border-color: rgba(68,64,60,0.26);
+    }
+
+    .option-key {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(38,38,38,0.06);
+      font-weight: 750;
+      font-size: 13px;
+    }
+
+    .option-text {
+      padding-top: 3px;
+    }
+
+    .quiz-nav {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .missing-box {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid rgba(133,77,14,0.2);
+      background: var(--warn-bg);
+      color: var(--warn);
+      border-radius: 18px;
+    }
+
+    .missing-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .mini-btn {
+      border: 1px solid rgba(133,77,14,0.2);
+      color: var(--warn);
+      background: #fff;
+      border-radius: 999px;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .result-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .result-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+    }
+
+    .result-card .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result-card .value {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .result-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .result-item {
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--card-solid);
+    }
+
+    .result-item.correct {
+      border-color: rgba(22,101,52,0.2);
+    }
+
+    .result-item.wrong {
+      border-color: rgba(153,27,27,0.18);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 650;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .badge.ok {
+      color: var(--ok);
+      background: var(--ok-bg);
+      border-color: rgba(22,101,52,0.16);
+    }
+
+    .badge.bad {
+      color: var(--bad);
+      background: var(--bad-bg);
+      border-color: rgba(153,27,27,0.16);
+    }
+
+    .answer-line {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .result-option {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      line-height: 1.55;
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .result-option.is-correct {
+      background: var(--ok-bg);
+      border-color: rgba(22,101,52,0.18);
+    }
+
+    .result-option.is-user-wrong {
+      background: var(--bad-bg);
+      border-color: rgba(153,27,27,0.18);
+    }
+
+    .empty-state {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.5);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        flex-direction: column;
+      }
+      .dashboard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .controls {
+        grid-template-columns: 1fr;
+      }
+      .result-summary {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 16px 12px 36px;
+      }
+      .dashboard {
+        gap: 9px;
+      }
+      .stat {
+        padding: 13px;
+        min-height: 100px;
+      }
+      .stat .value {
+        font-size: 21px;
+      }
+      .section {
+        padding: 14px;
+      }
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+      .topbar-inner {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .quiz-meta {
+        white-space: normal;
+      }
+      .result-summary {
+        grid-template-columns: 1fr;
+      }
+      .result-option {
+        grid-template-columns: 32px 1fr;
+      }
+      .result-option .badge {
+        grid-column: 2;
+        width: fit-content;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="homeView">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">個人題庫練習 · 本機紀錄</div>
+          <h1>ERP 財務模組測驗</h1>
+          <p class="subtitle">每次做完才看答案。題目連續答對 3 次後會自動視為已掌握，之後不再出現，直到你重置全部進度。</p>
+        </div>
+      </div>
+
+      <div class="dashboard" id="dashboard"></div>
+
+      <section class="panel section">
+        <div class="section-title">
+          <h2>開始測驗</h2>
+          <span class="note" id="remainingHint"></span>
+        </div>
+
+        <div class="controls">
+          <div class="control-card">
+            <label class="field-label">測驗模式</label>
+            <div class="mode-grid">
+              <button class="choice-btn active" data-mode="random" id="modeRandom" type="button">
+                <strong>隨機抽題</strong>
+                <span>從尚未掌握的題目中隨機抽出。</span>
+              </button>
+              <button class="choice-btn" data-mode="order" id="modeOrder" type="button">
+                <strong>依題號順序</strong>
+                <span>按照題號由小到大，並跳過已掌握題目。</span>
+              </button>
+              <button class="choice-btn" data-mode="range" id="modeRange" type="button">
+                <strong>指定題號區間</strong>
+                <span>輸入像 1-10，已掌握題目也會出現。</span>
+              </button>
+            </div>
+            <div class="range-panel hidden" id="rangePanel">
+              <label class="field-label" for="questionRange">指定題號區間</label>
+              <input id="questionRange" type="text" inputmode="text" placeholder="例如：1-10" />
+              <p class="note">指定區間不會跳過已掌握題目；答錯仍會把該題連續答對次數清零。</p>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <label class="field-label" for="questionCount">本次題數</label>
+            <div class="qty-row">
+              <input id="questionCount" type="number" min="1" step="1" value="30" inputmode="numeric" />
+              <button class="secondary" id="startBtn" type="button">開始</button>
+            </div>
+            <div class="quick-buttons">
+              <button class="pill" type="button" data-count="10">10 題</button>
+              <button class="pill" type="button" data-count="20">20 題</button>
+              <button class="pill" type="button" data-count="30">30 題</button>
+              <button class="pill" type="button" data-count="50">50 題</button>
+              <button class="pill" type="button" data-count="100">100 題</button>
+              <button class="pill" type="button" id="allRemainingBtn">全部可練習</button>
+            </div>
+            <p class="note" id="countNote">每 10 題顯示一頁；交卷後才會顯示答案。</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="danger" id="resetBtn" type="button">重置全部進度</button>
+          <span class="note">紀錄只存在目前這個瀏覽器，不會上傳到任何地方。</span>
+        </div>
+      </section>
+
+      <p class="footer-note">Built for GitHub Pages · 單一靜態 HTML 檔案</p>
+    </section>
+
+    <section id="quizView" class="hidden">
+      <div class="quiz-topbar">
+        <div class="topbar-inner">
+          <div class="quiz-meta" id="quizMeta"></div>
+          <div class="page-dots" id="pageDots"></div>
+        </div>
+      </div>
+
+      <section class="panel section">
+        <div class="section-title">
+          <h2 id="quizTitle">測驗中</h2>
+          <button class="secondary" id="quitBtn" type="button">返回首頁</button>
+        </div>
+
+        <div id="questionsContainer" class="questions-stack"></div>
+
+        <div id="missingBox" class="missing-box hidden">
+          <strong>還有題目沒有作答</strong>
+          <div class="note">點題號可以直接跳回那一題。未作答如果仍然交卷，會算錯。</div>
+          <div class="missing-list" id="missingList"></div>
+          <div class="actions">
+            <button class="primary" id="forceSubmitBtn" type="button">仍然交卷</button>
+            <button class="secondary" id="hideMissingBtn" type="button">回去作答</button>
+          </div>
+        </div>
+
+        <div class="quiz-nav">
+          <button class="secondary" id="prevPageBtn" type="button">上一頁</button>
+          <div class="note" id="pageInfo"></div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="secondary" id="nextPageBtn" type="button">下一頁</button>
+            <button class="primary" id="submitBtn" type="button">交卷</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="resultView" class="hidden">
+      <section class="panel section">
+        <div class="section-title">
+          <div>
+            <h2>本次結果</h2>
+            <p class="note" id="resultDate" style="margin:6px 0 0;"></p>
+          </div>
+          <button class="secondary" id="backHomeBtn" type="button">回首頁</button>
+        </div>
+
+        <div class="result-summary" id="resultSummary"></div>
+
+        <div class="actions">
+          <button class="secondary" id="toggleWrongBtn" type="button">只顯示本次錯題</button>
+          <button class="primary" id="restartSameModeBtn" type="button">再做一次</button>
+        </div>
+
+        <div id="resultList" class="result-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const QUESTIONS = [
+  {
+    "id": 1,
+    "question": "影響銀行存款異動單據確認後,將存款餘額回饋於哪?",
+    "options": {
+      "A": "行事曆建立作業",
+      "B": "財務參數設定作業",
+      "C": "單據性質設定作業",
+      "D": "銀行帳號建立作業"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 2,
+    "question": "關於財務參數設定中的『會計現行年度、期別』描述,下列何者有誤?",
+    "options": {
+      "A": "目前系統處理會計帳務的期別",
+      "B": "系統上線後須透過月底結轉作業來更新年度期別",
+      "C": "現行年月前的會計傳票皆不可有新增修改",
+      "D": "上線前須手動設定會計系統的現行年度期別"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 3,
+    "question": "ERP系統之會計傳票建立作業,以下功能說明何者有誤?",
+    "options": {
+      "A": "選擇借方可輸入英文字母『D』",
+      "B": "單身資料刪除要按CTRL+DEL",
+      "C": "『摘要』欄位按F2鈕可輸入發票資料",
+      "D": "按Insert鍵進行單身資料穿插"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 4,
+    "question": "某資產在8月1日的取得成本=$60,000,累積折舊=$58,500;若在8月1日出售此資產, 出售金額為$5,000,請問處分該資產的損益是多少?",
+    "options": {
+      "A": "處分利得$3,500",
+      "B": "處分損失$3,500",
+      "C": "處分利得$1,500",
+      "D": "處分損失$1,500"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 5,
+    "question": "「銀行存款存提作業」裡影響存款增減異動,下列何者正確?",
+    "options": {
+      "A": "轉帳金額",
+      "B": "轉帳金額 X 匯率",
+      "C": "轉帳金額 X 匯率+手續費",
+      "D": "(轉帳金額+手續費) X 匯率"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 6,
+    "question": "關於「資產報廢單建立作業」下列何者有誤?",
+    "options": {
+      "A": "預留殘值因而減少",
+      "B": "不須產生會計傳票",
+      "C": "保管數量因而減少",
+      "D": "月折舊額因而減少"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 7,
+    "question": "資產異動單據與銷帳日期的關聯,下列何者有誤?",
+    "options": {
+      "A": "資產改良單",
+      "B": "資產報廢單",
+      "C": "資產折舊單",
+      "D": "資產出售單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 8,
+    "question": "『以收款日期排序,將沖帳明細逐一呈現,以利出納及會計人員核對收款資料及帳務 異動。』上述的是哪一張報表?",
+    "options": {
+      "A": "結帳單明細表",
+      "B": "收款單明細表",
+      "C": "應收帳款對帳單",
+      "D": "業務員帳款明細表"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 9,
+    "question": "會計交易活動流程下列何者正確?甲.會計傳票建立 乙.傳票過帳 丙.月結 丁.傳票核准",
+    "options": {
+      "A": "甲乙丁丙",
+      "B": "甲乙丙丁",
+      "C": "甲丁丙乙",
+      "D": "甲丁乙丙"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 10,
+    "question": "從國稅局買回發票或配予發票號碼後,發票資料需先在何作業設定後才可使用?",
+    "options": {
+      "A": "每月發票建立作業",
+      "B": "進銷項憑證維護作業",
+      "C": "營業稅申報資料建立作業",
+      "D": "以上皆非"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 11,
+    "question": "鼎新 ERP 系統之「結帳單自動結帳作業」,下列描述何者有誤?",
+    "options": {
+      "A": "同客戶不同幣別帳款結成同一張結帳單",
+      "B": "同客戶不同廠別結成同一張結帳單",
+      "C": "同客戶不同收款業務員結成同一張結帳單",
+      "D": "同客戶且發票號碼空白者結成同一張結帳單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 12,
+    "question": "『成功科技每個月月底固定須製作提列租金費用的分錄傳票』該如何節省每月輸入相 同傳票的時間?",
+    "options": {
+      "A": "建立現支傳票",
+      "B": "建立現收傳票",
+      "C": "建立一般傳票",
+      "D": "建立常用傳票"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 13,
+    "question": "關於發票資料與 ERP 單據的描述,下列何者有誤?",
+    "options": {
+      "A": "銷貨單可設定自動產生發票號碼",
+      "B": "進貨單可設定自動產生發票號碼",
+      "C": "月結發票號碼輸入在結帳單據",
+      "D": "應付憑單須設定歸屬申報公司"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 14,
+    "question": "以下何者不是『固定資產管理系統』之作業?",
+    "options": {
+      "A": "資產取得單建立作業",
+      "B": "資產改良單建立作業",
+      "C": "資產重估單建立作業",
+      "D": "資產報廢單建立作業"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 15,
+    "question": "下列哪一張 ERP 系統應收票據之報表可作為資金調度及逾期票款催收的依據",
+    "options": {
+      "A": "資金預估明細表",
+      "B": "應收票據票況表",
+      "C": "應收票據到期明細表",
+      "D": "銀行存款明細帳"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 16,
+    "question": "ERP 系統在推算資金預估(支出)日期時,除了考量「付款條件建立作業」之外,還有 下列哪一作業設定?",
+    "options": {
+      "A": "應付管理系統「單據性質設定作業」",
+      "B": "應付管理系統「會計科目設定作業」",
+      "C": "基本資料管理系統「行事曆建立作業」",
+      "D": "基本資料管理系統「財務參數設定作業」"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 17,
+    "question": "下列何者不是「資產類別建立作業」裡預設的資產資料項目?",
+    "options": {
+      "A": "資產科目",
+      "B": "累計折舊科目",
+      "C": "耐用月數",
+      "D": "取得成本"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 18,
+    "question": "有四張進貨單據,如下: 1.甲廠商,進貨金額為台幣 2 萬元,發票號碼 DE12345600 2甲廠商,進貨金額為台幣 1 萬元,發票號碼空白 3.乙廠商,進貨金額為台幣 5 千元,發票號碼 FD12578612 4 甲廠商,進貨金額為美金 2 千元,發票號碼空白 以上進行「應付帳款自動結帳作業」會產生幾張應付憑單?",
+    "options": {
+      "A": "兩張應付憑單",
+      "B": "三張應付憑單",
+      "C": "四張應付憑單",
+      "D": "一張應付憑單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 19,
+    "question": "假若現欲結帳 3/1 至 3/31 的進貨資料,請問是否納入此期間結帳是依據哪種日期?",
+    "options": {
+      "A": "進貨單據日期",
+      "B": "驗收日期",
+      "C": "採購日期",
+      "D": "發票日期"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 20,
+    "question": "在「每月發票建立作業」之「已用編號」欄位會由下列哪些單據回寫?1 應付憑單 2 結 帳單 3 銷貨單 4 進貨單",
+    "options": {
+      "A": "12",
+      "B": "23",
+      "C": "34",
+      "D": "14"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 21,
+    "question": "『會計傳票建立作業』的目的為何?",
+    "options": {
+      "A": "輸入公司平日發生的交易分錄",
+      "B": "可於此作業編製財務報表",
+      "C": "可於此作業記錄訂單資料",
+      "D": "可於此作業記錄採購資料"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 22,
+    "question": "有關應收票據建立作業,下列描述何者有誤?",
+    "options": {
+      "A": "當客戶以支據支付貨款時須建立",
+      "B": "「客票」指的是 非客戶本身所開立的支票",
+      "C": "「目前票況」是唯讀欄位",
+      "D": "「付款銀行」是設定在銀行帳號建立作業而自動帶入應收票據"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 23,
+    "question": "「成功科技於01/05購入筆記型電腦1台,取得金額共計NT$45,000」關於鼎新ERP系 統之新購資產處理, 1.新增資產進貨單 2.新增資產取得單 3.新增資產資料建立作業 下列何者正確?",
+    "options": {
+      "A": "123",
+      "B": "12",
+      "C": "13",
+      "D": "23"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 24,
+    "question": "關於鼎新ERP系統的『資產負債表』描述,下列何者有誤?",
+    "options": {
+      "A": "表達企業某一期間的財務狀況",
+      "B": "系統提供報告式及帳戶式兩種格式",
+      "C": "為對外公告財務狀況及會計師查帳之重要報表之一",
+      "D": "由資產、負債及業主權益類科目構成"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 25,
+    "question": "設定『資產資料建立作業』的『折舊分攤方式』,其主要目的為何?",
+    "options": {
+      "A": "若公司有做利潤中心管理,可設定折舊分攤方式,後續可依保管部門或固定比率彙 總各部門應分攤的折舊費用。",
+      "B": "可統計各資產保管人及保管部門資料。",
+      "C": "可分析資產的折舊方法。",
+      "D": "可將資產依內部管理或稅務資產分攤折舊。"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 26,
+    "question": "最近三年內查無違章欠稅情事且符合下列條件之一營業人,經向所在地稽徵機關申請 核准「彙總申 報」,但不包括下列何者?",
+    "options": {
+      "A": "三聯式收銀機統一發票進項憑證",
+      "B": "零稅率出口銷項憑證",
+      "C": "每張稅額五百元以下之進項憑證",
+      "D": "銷項免用發票"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 27,
+    "question": "『驗收後 0 個月逢 25 日』是指每月結帳區間為?",
+    "options": {
+      "A": "上個月 26 日~本月 25 日",
+      "B": "上個月 25 日~本月 25 日",
+      "C": "本月 1 日~本月 31 日",
+      "D": "本月 25 日~本月 25 日"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 28,
+    "question": "執行資產的外送建立作業,會有哪些影響?",
+    "options": {
+      "A": "資產的數量會減少",
+      "B": "資產的數量不變",
+      "C": "資產的折舊金額會減少",
+      "D": "資產的改良成本金額會增加"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 29,
+    "question": "以下何者是『結帳單』結帳的方式?",
+    "options": {
+      "A": "人工手動結帳",
+      "B": "自動結帳",
+      "C": "直接結帳",
+      "D": "以上皆是。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 30,
+    "question": "「在某一個時點列印每一種票況的明細資料,並進行票據張數、金額的統計,以供日 常檢視及查核。」 以上描述的是 ERP 系統的哪一張報表?",
+    "options": {
+      "A": "應收票據票況表",
+      "B": "資金預估明細表",
+      "C": "銀行存款明細帳",
+      "D": "應收票據到期明細表"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 31,
+    "question": "關於應收帳款處理流程,下列描述何者有誤?",
+    "options": {
+      "A": "結帳單確認即為應收帳款成立",
+      "B": "收款單確認即為應收帳款減項",
+      "C": "須將結帳單內容切立會計傳票記錄帳款異動",
+      "D": "收款單即是會計傳票,因此無須記錄於會計總帳系統"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 32,
+    "question": "假若 A 廠商這個月帳款有問題,目前暫無法付款給 A 廠商,在系統中建議如何處理該筆 應付帳款?",
+    "options": {
+      "A": "將應付憑單取消確認",
+      "B": "將應付憑單刪除",
+      "C": "將應付憑單凍結付款",
+      "D": "將應付憑單作廢"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 33,
+    "question": "建立公司往來銀行的基本資料,該在哪一個作業完成?",
+    "options": {
+      "A": "財務參數設定作業",
+      "B": "行事曆建立作業",
+      "C": "銀行帳號建立作業",
+      "D": "單據性質設定作業"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 34,
+    "question": "客戶未結帳的銷貨單有 1/29、2/3、2/15、2/26,執行『結帳單自動結帳作業-依客 戶結帳日(25 號)』 結 2 月帳款,下列敘述何者正確?",
+    "options": {
+      "A": "四張銷貨單都納入結帳",
+      "B": "1/29 的銷貨單不會納入結帳",
+      "C": "四張銷貨單都不會納入結帳",
+      "D": "只有 1/29、2/3、2/15 會納入結帳"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 35,
+    "question": "為確保盤點資料之帳面量正確,進行實際盤點時可進行下列哪一作業?",
+    "options": {
+      "A": "盤點資料產生作業",
+      "B": "盤點資料建立作業",
+      "C": "盤點帳面量重計作業",
+      "D": "資產調整單建立作業"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 36,
+    "question": "樣版分錄轉成正式傳票,下列順序何者正確?1 查詢會計傳票 2 常用傳票建立 3 常用 傳票複製作業 4 常用傳票確認、過帳 5 會計傳票確認、過帳",
+    "options": {
+      "A": "12345",
+      "B": "24315",
+      "C": "2431",
+      "D": "2315"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 37,
+    "question": "銷貨日期為 3/27,客戶結帳日為 25 日,付款條件為『結帳日起算次月 20 日收(付) 款,付款日起算票期 2 個月』,請問推算出來的預計兌現日為何?",
+    "options": {
+      "A": "6/20",
+      "B": "5/20",
+      "C": "7/20",
+      "D": "8/20"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 38,
+    "question": "應收帳款結帳的條件,下列何者正確? 甲.已確認未結帳銷貨單 乙.已確認未結帳銷退單 丙.已確認未結帳現銷單 丁.已確認已結帳銷貨單",
+    "options": {
+      "A": "甲乙丙丁",
+      "B": "甲乙丁",
+      "C": "甲乙丙",
+      "D": "甲乙"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 39,
+    "question": "下列哪一系統作業可避免應付票號輸入錯誤或跳號發生?",
+    "options": {
+      "A": "單據性質設定作業",
+      "B": "銀行帳號資料建立作業",
+      "C": "銀行支票本建立作業",
+      "D": "供應廠商資料建立作業"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 40,
+    "question": "如何判定該張會計傳票是有效且納入報表計算的?",
+    "options": {
+      "A": "該傳票有一個紅色的『核』字",
+      "B": "該傳票會看 到一個紅色的『確』字圖章。",
+      "C": "該傳票會看到一個紅色的『核』字,且其『確認碼』已打勾。",
+      "D": "該傳票會看到一個紅色的『核』字,且其『過帳碼』已打勾。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 41,
+    "question": "哪種狀況銀行存款會減少?",
+    "options": {
+      "A": "存款單確認",
+      "B": "應收票據兌現",
+      "C": "應付票據兌現",
+      "D": "以上皆是"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 42,
+    "question": "「會計傳票建立作業」的單身若要輸入借貸別之貸方,以下的輸入方式,哪一項是正 確的?",
+    "options": {
+      "A": "以滑鼠點下拉鍵點選「貸」",
+      "B": "輸入英文字母「C」。",
+      "C": "輸入數字「2」。",
+      "D": "以上皆是。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 43,
+    "question": "執行「自動攤提折舊作業」後,可以到「佇列工作控制台」的哪一個頁籤,看到系統 處理的狀態?",
+    "options": {
+      "A": "《報表》頁籤",
+      "B": "《文字檔報表》頁籤",
+      "C": "《批次》頁籤",
+      "D": "《確認》頁籤"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 44,
+    "question": "若要將未過帳的傳票過帳,可以執行哪一支作業?",
+    "options": {
+      "A": "月底結轉作業",
+      "B": "傳票回轉作業",
+      "C": "傳票指定結案作業",
+      "D": "傳票整批過帳作業"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 45,
+    "question": "現金支出傳票單頭所輸入的收支科目為何?",
+    "options": {
+      "A": "借方科目",
+      "B": "貸方科目",
+      "C": "以上皆可",
+      "D": "不須輸入"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 46,
+    "question": "「資產改良建立作業」確認後將改良成本寫回資產資料建立作業的哪個欄位?",
+    "options": {
+      "A": "取得成本",
+      "B": "累積折舊",
+      "C": "改良成本",
+      "D": "預留殘值"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 47,
+    "question": "何者不是「會計傳票建立作業」的種類?",
+    "options": {
+      "A": "轉帳傳票",
+      "B": "現收傳票",
+      "C": "現支傳票",
+      "D": "迴轉傳票"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 48,
+    "question": "會計傳票若單身已輸入一筆分錄資料,要複製此分錄到下一筆分錄,可以在下一筆分 錄上按哪一個 功能鍵呢?",
+    "options": {
+      "A": "F2",
+      "B": "F3",
+      "C": "F4",
+      "D": "F5"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 49,
+    "question": "以下哪一種應收票據的「票況」,會增加銀行帳戶的存款餘額?",
+    "options": {
+      "A": "收票",
+      "B": "託收",
+      "C": "兌現",
+      "D": "轉付"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 50,
+    "question": "哪種狀況銀行存款會增加?",
+    "options": {
+      "A": "提款單確認",
+      "B": "應收票據兌現",
+      "C": "應付票據兌現",
+      "D": "以上皆是"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 51,
+    "question": "開立一張支票給廠商,後因故以現金支付貨款,將開立的支票取回作廢,使用者應該 執行哪一項作業?",
+    "options": {
+      "A": "開票",
+      "B": "兌現",
+      "C": "還票",
+      "D": "註銷"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 52,
+    "question": "以下何者不是會計總帳管理系統提供的報表?",
+    "options": {
+      "A": "日記帳",
+      "B": "日計表",
+      "C": "現金簿",
+      "D": "401申報書"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 53,
+    "question": "「會計傳票建立作業」單身的「序號」,若由系統自動賦予,以下哪一個號碼有可能 是由系統自動賦予的?",
+    "options": {
+      "A": "1",
+      "B": "10",
+      "C": "15",
+      "D": "99"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 54,
+    "question": "輸入傳票時,若需要刪除一筆貸方的資料該使用什麼按鍵?",
+    "options": {
+      "A": "DELETE",
+      "B": "ALT+DEL",
+      "C": "CTRL+DEL",
+      "D": "ESC"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 55,
+    "question": "如果要在「會計傳票建立作業」單身兩筆資料間,加插分錄資料,可以按哪一個按鈕?",
+    "options": {
+      "A": "Ctrl+Insert",
+      "B": "Insert",
+      "C": "Shift+Insert",
+      "D": "Alt+Insert"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 56,
+    "question": "我們通常會在「會計傳票建立作業」單身輸入借貸平衡的分錄,在甚麼情況下只需要 輸入「借方」 或「貸方」的科目資料就可以呢?",
+    "options": {
+      "A": "輸入現支或現收傳票時。",
+      "B": "輸入轉帳傳票時。",
+      "C": "輸入應計傳票時。",
+      "D": "輸入應計回轉傳票時。"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 57,
+    "question": "「會計傳票建立作業」的單身若要輸入借貸別之借方,以下的輸入方式,哪一項是正 確的?",
+    "options": {
+      "A": "以滑鼠點下拉鍵點選「借」",
+      "B": "輸入英文字母「D」",
+      "C": "輸入數字「1」",
+      "D": "以上皆是。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 58,
+    "question": "「會計傳票」輸入後要在什麼狀態下,才會納入報表計算?",
+    "options": {
+      "A": "只要輸入就可",
+      "B": "已確認的會計傳票即可",
+      "C": "已確認且已過帳的會計傳票。",
+      "D": "已確認且未結案的會計傳 票。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 59,
+    "question": "現金收入傳票的單身是輸入哪一方之科目?",
+    "options": {
+      "A": "借方",
+      "B": "貸方",
+      "C": "以上皆可",
+      "D": "不須輸入借貸方"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 60,
+    "question": "以下哪一種應付票據的「票況」,會減少銀行帳戶的存款餘額?",
+    "options": {
+      "A": "開票",
+      "B": "兌現",
+      "C": "註銷",
+      "D": "退票"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 61,
+    "question": "以下何者是「結帳單」結帳的方式?",
+    "options": {
+      "A": "人工手動結帳",
+      "B": "自動結帳",
+      "C": "直接結帳",
+      "D": "以上皆是。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 62,
+    "question": "「會計傳票建立作業」的目的為何?",
+    "options": {
+      "A": "輸入公司平日發生的交易分錄",
+      "B": "可於此作業編製財務報表",
+      "C": "可於此作業記錄訂單資料",
+      "D": "可於此作業記錄採購資料"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 63,
+    "question": "為何「會計傳票建立作業」單身的「序號」是每 10 號跳一個序號呢?",
+    "options": {
+      "A": "方便在兩筆序號間加插其他借方或貸方的資料。",
+      "B": "因為每 10 號跳一個序號,比較容易控管資料筆數。",
+      "C": "因為每 10 號跳一個序號,電腦在資料處理上比較快速。",
+      "D": "因為 10 號是系統認定最低的序號,也就是 代表 1 號的意思。"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 64,
+    "question": "票據系統用到的是哪一種行事曆?",
+    "options": {
+      "A": "公司",
+      "B": "工廠",
+      "C": "銀行",
+      "D": "刷卡班別"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 65,
+    "question": "下列何者不是應付憑單的來源的單據?",
+    "options": {
+      "A": "採購進貨單",
+      "B": "採購退貨單",
+      "C": "託外進貨單",
+      "D": "生產入庫單"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 66,
+    "question": "應收/應付票據建立作業中,票況的狀態是如何而來的?",
+    "options": {
+      "A": "手動輸入",
+      "B": "系統更新",
+      "C": "不會更新",
+      "D": "新增票據時,一併輸入的值"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 67,
+    "question": "有關常用傳票的建立以下描述何者為非",
+    "options": {
+      "A": "常用傳票不一定要建立",
+      "B": "常用傳票是為了日常傳票輸入時能複製使用",
+      "C": "常用傳票一定是現金收支傳票",
+      "D": "常用傳票的複製分整批複製與單筆複製兩種"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 68,
+    "question": "關於「應付帳款月底結轉作業」,下列描述何者有誤?",
+    "options": {
+      "A": "月結後應付現行年月加一",
+      "B": "小於應付現行年月的應付憑單或付款單,不可確認、不可取消確認",
+      "C": "執行後產生應付帳款月檔,記錄各廠商期末應付帳款",
+      "D": "可以確認、取消確認應付現行年月的應付憑單或付款單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 69,
+    "question": "關於會計系統常用傳票的描述下列何者為非?",
+    "options": {
+      "A": "可至常用傳票建立作業建立經常須做的傳票分錄",
+      "B": "可利用常用傳票複製作業產生正式傳票",
+      "C": "金額一定要輸入",
+      "D": "可將已存檔之歷史傳票加入成為常用傳票"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 70,
+    "question": "影響資產帳務增減的異動項目為下列何者?",
+    "options": {
+      "A": "移轉",
+      "B": "外送",
+      "C": "重估",
+      "D": "收回"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 71,
+    "question": "以下哪個票況不屬於「應付票據建立作業」可以看到的票況?",
+    "options": {
+      "A": "開票",
+      "B": "兌現",
+      "C": "收票",
+      "D": "註銷"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 72,
+    "question": "關於會計系統傳票過帳處理,下列敘述何者為非?",
+    "options": {
+      "A": "已過帳傳票過帳碼會打勾",
+      "B": "一般正常的傳票借貸不平衡仍可過帳",
+      "C": "可執行傳票整批過帳",
+      "D": "可執行傳票單筆過帳"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 73,
+    "question": "WF-ERP 會計總帳系統會計期間的最後一個月執行「月底結轉作業」後,會將當年度 損益金額轉入下列哪一個項目?",
+    "options": {
+      "A": "本期損益科目",
+      "B": "股本",
+      "C": "上期損益科目",
+      "D": "資本公積"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 74,
+    "question": "哪種報表可以表達企業某一特定時日的財務狀況?",
+    "options": {
+      "A": "試算表",
+      "B": "日記表",
+      "C": "日記帳",
+      "D": "資產負債表"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 75,
+    "question": "會計總帳系統中有關『月底結轉作業』描述何者為非",
+    "options": {
+      "A": "一定要在每月月底執行",
+      "B": "現行期別會加1",
+      "C": "由系統自動算出本期損益",
+      "D": "在該會計年度最後一期時,會結算出上期損益"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 76,
+    "question": "會計系統期初開帳可用下列哪一張報表?",
+    "options": {
+      "A": "損益表",
+      "B": "日記表",
+      "C": "試算表",
+      "D": "製造成本表"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 77,
+    "question": "下列敘述何者是應收票據建立作業中【客票】代表的用意?",
+    "options": {
+      "A": "這張支票是客戶的供應商的支票",
+      "B": "該支票是銀行本票",
+      "C": "該支票沒有禁止背書轉讓字樣",
+      "D": "泛稱該支票 非客戶本身的票據"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 78,
+    "question": "用來顯示企業某一段期間經營成果的報表為何?",
+    "options": {
+      "A": "試算表",
+      "B": "資產負債表",
+      "C": "損益表",
+      "D": "日記帳"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 79,
+    "question": "關於銀行存款月結描述,下列何者有誤?",
+    "options": {
+      "A": "結算當期存款期末餘額",
+      "B": "期末餘額結轉到下期期初",
+      "C": "存款現行年月+1",
+      "D": "假設 7 月份資料已結轉,仍可以修改 7 月以前的存款單"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 80,
+    "question": "下列哪張報表最適合做為每月寄發給客戶,與客戶對帳使用的報表?",
+    "options": {
+      "A": "客戶帳款明細表",
+      "B": "應收帳款對帳單",
+      "C": "客戶帳款催收管制表",
+      "D": "業務員帳款明細表"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 81,
+    "question": "以下何者是「票據資金管理系統」的作業?",
+    "options": {
+      "A": "銀行存款存提作業",
+      "B": "應收票據建立作業",
+      "C": "應付票據建立作業",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 82,
+    "question": "應付票據建立作業中,可開窗查詢哪張單據資料,做為開票的依據或聯結,以利後續 核對?",
+    "options": {
+      "A": "付款單",
+      "B": "收款單",
+      "C": "結帳單",
+      "D": "應付憑單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 83,
+    "question": "以[傳票日期]為檢視角度查看某個日期區間之傳票資料是哪張報表?",
+    "options": {
+      "A": "日記帳",
+      "B": "日記表",
+      "C": "試算表",
+      "D": "損益表"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 84,
+    "question": "對於常用傳票的描述下列何者有誤?",
+    "options": {
+      "A": "常用傳票可以整批複製產生會計傳票",
+      "B": "常用傳票金額不一定要輸入",
+      "C": "常用傳票可以單筆複製成會計傳票",
+      "D": "會計傳票不可以複製成常用傳票"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 85,
+    "question": "『應付憑單建立作業』單尾的【本幣已付金額】從哪裡來的",
+    "options": {
+      "A": "進貨單的合計",
+      "B": "應付憑單單身會計科目金額的合計",
+      "C": "付款單資料沖帳後回寫的",
+      "D": "單頭資料輸入的"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 86,
+    "question": "以下何者不是「資產資料建立作業」裡可以選擇的折舊方法?",
+    "options": {
+      "A": "可不提折舊",
+      "B": "平均法",
+      "C": "定率遞減法",
+      "D": "工作時間法"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 87,
+    "question": "下列何者對銀行存款不會有增減影響?",
+    "options": {
+      "A": "銀行存款單",
+      "B": "應付票據開票",
+      "C": "應收票據兌現",
+      "D": "銀行提款單"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 88,
+    "question": "應付系統「應付憑單自動結帳作業」不含何種來源?",
+    "options": {
+      "A": "進貨",
+      "B": "取得資產",
+      "C": "託外進/退貨",
+      "D": "退貨"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 89,
+    "question": "下列何者不屬於「付款單建立作業」裡可以選擇的「類別」?",
+    "options": {
+      "A": "一般",
+      "B": "電匯",
+      "C": "應付票據",
+      "D": "沖帳"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 90,
+    "question": "某客戶有一張結帳單,若該客戶以電匯方式支付此筆貨款,以下哪一種收款單單身類 別是正確的?",
+    "options": {
+      "A": "借方類別選擇「2.票據」,貸方類別選擇「4.沖帳」",
+      "B": "借方類別選擇「4.沖帳」,貸方類別選擇「2.票據」",
+      "C": "借方類別選擇「1.一般」,貸方類別選擇「4.沖帳」",
+      "D": "借方類別選擇「1.一般」,貸方類別選擇「2.票據」"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 91,
+    "question": "欲檢視目前會計傳票是否有借貸不平衡者,應列印哪張報表?",
+    "options": {
+      "A": "日計帳",
+      "B": "傳票明細列印作業",
+      "C": "傳票憑證列印作業",
+      "D": "明細分類帳"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 92,
+    "question": "下列何者最能描述會計總帳系統,「試算表」的用途?",
+    "options": {
+      "A": "經整理之彙總帳,將會計明細科目整理後的交易記錄。",
+      "B": "以「傳票日期」為角度,查看特定日期區間之傳票資料。",
+      "C": "將總分類帳中所有帳戶之餘額彙總列表,以視其借方總額與貸方總額是否平衡。",
+      "D": "以「會計科目」的角度,檢視立沖帳目資料。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 93,
+    "question": "『應付憑單建立作業』單頭有一個【凍結付款】鈕,以下描述何者正確?",
+    "options": {
+      "A": "欲付款時將凍結付款取消即可",
+      "B": "凍結付款後要等一下個月才能支付款項",
+      "C": "凍結付款可由系統啟動,如 果有進貨單被作廢就會啟動",
+      "D": "凍結付款如果要取消,再執行一次結帳作業就好)"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 94,
+    "question": "「應付憑單」可記錄哪些交易事項?",
+    "options": {
+      "A": "進貨交易",
+      "B": "退貨交易",
+      "C": "其他賒帳支出",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 95,
+    "question": "下列何者是應付票據之票況?",
+    "options": {
+      "A": "收票",
+      "B": "壞帳",
+      "C": "託收",
+      "D": "兌現"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 96,
+    "question": "在新增「資產資料建立作業」時,若輸入「耐用月數=60 個月」,「未攤月數」會是 多少?",
+    "options": {
+      "A": "72個月",
+      "B": "60個月",
+      "C": "48個月",
+      "D": "36個月"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 97,
+    "question": "當會計傳票輸入時借貸不平衡是否可以存檔?",
+    "options": {
+      "A": "可以",
+      "B": "不可以",
+      "C": "會計系統參數設定之",
+      "D": "以上皆非"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 98,
+    "question": "下列何者不是「應付管理系統」提供的報表?",
+    "options": {
+      "A": "應付憑單明細表",
+      "B": "付款單明細表",
+      "C": "應付帳款明細表",
+      "D": "應付票據明細表"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 99,
+    "question": "應收票據建立作業中,可開窗查詢哪張單據資料,做為收票的依據或聯結,以利後續 核對?",
+    "options": {
+      "A": "付款單",
+      "B": "收款單",
+      "C": "結帳單",
+      "D": "應付憑單"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 100,
+    "question": "以[會計科目]為檢視角度查看某個日期區間會計科目本期異動金額及餘額資料是哪張報 表?",
+    "options": {
+      "A": "日記帳",
+      "B": "日記表",
+      "C": "資產負債表",
+      "D": "損益表"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 101,
+    "question": "以下何者是「銀行存款存提作業」單身可選擇的「轉帳對象」?",
+    "options": {
+      "A": "公司",
+      "B": "廠商",
+      "C": "人員",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 102,
+    "question": "當員工轉調部門,資產必須移交時應登打何種單據?",
+    "options": {
+      "A": "資產調整單",
+      "B": "資產外送單",
+      "C": "資產移轉單",
+      "D": "資產折舊單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 103,
+    "question": "公司採自動結帳-「依客戶結帳日」方式結帳,每家客戶的結帳日不同,例如:客戶甲 的結帳日為 每月月底,客戶乙的結帳日為每月 25 日...等,請問該於哪支作業中設定 不同客戶不同的結帳日?",
+    "options": {
+      "A": "單據性質設定",
+      "B": "客戶資料建立",
+      "C": "會計科目設定",
+      "D": "財務參數設定"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 104,
+    "question": "已過帳的傳票可以執行以下哪種動作?",
+    "options": {
+      "A": "已過帳傳票還原",
+      "B": "已過帳傳票取消確認",
+      "C": "傳票作廢",
+      "D": "傳票修改"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 105,
+    "question": "如何判定該張會計傳票是有效且納入報表計算的?",
+    "options": {
+      "A": "該傳票有一個紅色的「核」字",
+      "B": "該傳票會看到一個紅色的「確」字圖章。",
+      "C": "該傳票會看到一個紅色的「核」字,且其「確認碼」已打勾。",
+      "D": "該傳票會看到一個紅色的「核」字,且其「過帳碼」已打勾。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 106,
+    "question": "銀行存款存提作業,轉帳時轉帳對象可選哪些對象?",
+    "options": {
+      "A": "公司",
+      "B": "廠商",
+      "C": "人員",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 107,
+    "question": "下列何者是折舊分攤方式?",
+    "options": {
+      "A": "依金額分攤",
+      "B": "依人數分攤",
+      "C": "依變動比率",
+      "D": "依保管部門"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 108,
+    "question": "下列有關『應付帳款月底結轉作業』的描述何者為非?",
+    "options": {
+      "A": "當月應付系統資料輸入完畢無誤後執行此作業",
+      "B": "執行後應付現行年月會加 1",
+      "C": "結轉後會產生廠商的每月統計資料",
+      "D": "應付現行年月跟庫存的現行年月有關"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 109,
+    "question": "以下何種報表為會計師檢查固定資產及年底稅務申報時之重點報表?",
+    "options": {
+      "A": "財產目錄清冊",
+      "B": "資產分佈清冊",
+      "C": "資產異動統計表",
+      "D": "資產購入清冊"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 110,
+    "question": "以下何種交易的發生,不可在「銀行存款存提作業」裡記錄?",
+    "options": {
+      "A": "將現金存入銀行",
+      "B": "將應收票據拿到銀行託收",
+      "C": "銀行轉帳",
+      "D": "從銀行提取現金"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 111,
+    "question": "關於會計月結作業的描述下列何者為非?",
+    "options": {
+      "A": "月結後會計現行期別加一",
+      "B": "月結後系統自動算出本期損益",
+      "C": "當月份傳票輸入完畢並過帳後即可執行月結作業",
+      "D": "會計年度最後一期執行完月結作業後,需再手動執行年結作業"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 112,
+    "question": "以下何種報表最適合用來檢視「各資產之保管部門、保管人及放置地點」?",
+    "options": {
+      "A": "財產目錄清冊",
+      "B": "資產分佈清冊",
+      "C": "資產異動統計表",
+      "D": "資產購入清冊"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 113,
+    "question": "某客戶有一張結帳單,若該客戶以現金支付此筆貨款,以下哪一種收款單單身類別是 正確的?",
+    "options": {
+      "A": "借方類別選擇「2.票據」,貸方類別選擇「4.沖帳」",
+      "B": "借方類別選擇「4.沖帳」,貸方類別選擇「2.票據」",
+      "C": "借方類別選擇「2.票據」,貸方類別選擇「1.一般」",
+      "D": "借方類別選擇「1.一般」,貸方類別選擇「4.沖帳」"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 114,
+    "question": "要開立應付票據,要先將公司的支票本起訖號碼輸入於哪支作業?",
+    "options": {
+      "A": "銀行帳號建立作業",
+      "B": "銀行支票本建立作業",
+      "C": "供應廠商資料建立作業",
+      "D": "單據性質設定作業"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 115,
+    "question": "以下何者為「固定資產管理系統」所提供的報表?",
+    "options": {
+      "A": "財產目錄清冊",
+      "B": "資產分佈清冊",
+      "C": "資產異動統計表",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 116,
+    "question": "下列何者不是「應收管理系統」提供的報表?",
+    "options": {
+      "A": "結帳單明細表",
+      "B": "收款單明細表",
+      "C": "應收帳款對帳單",
+      "D": "客戶佣金請領明細表"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 117,
+    "question": "以下何者非應付憑單的產生方式?",
+    "options": {
+      "A": "人工手動輸入",
+      "B": "進貨單直接結帳產生",
+      "C": "採購單直接結帳產生",
+      "D": "批次作業「應付憑單自動結帳作業」 產生"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 118,
+    "question": "已過帳傳票如需修改,首先應執行何作業?",
+    "options": {
+      "A": "已過帳傳票重新過帳",
+      "B": "已過帳傳票還原",
+      "C": "傳票整批過帳",
+      "D": "取消確認"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 119,
+    "question": "「會計傳票建立作業」中,部門不可空白為什麼?",
+    "options": {
+      "A": "會計科目部門管理未打勾",
+      "B": "會計科目部門管理打勾",
+      "C": "部門資料未建立",
+      "D": "部門層級未建立"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 120,
+    "question": "在應收系統的報表可以用來提醒公司員工對客戶跟催帳款是?",
+    "options": {
+      "A": "結帳單明細表",
+      "B": "收款單明細表",
+      "C": "應收帳款對帳單",
+      "D": "業務員帳款明細表"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 121,
+    "question": "欲得知本公司至某一時間點應準備多少資金支付給廠商,可參考哪一張報表?",
+    "options": {
+      "A": "應付憑單明細表",
+      "B": "應付帳款明細表",
+      "C": "模擬付款明細表",
+      "D": "付款單明細表"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 122,
+    "question": "某客戶有一張結帳單,若該客戶以國外電匯方式支付此筆貨款,而且支付的貨款換算 成本國幣後, 比之前認列的應收帳款金額還大,以下哪一種收款單單身類別,最適合 認列此筆匯差?",
+    "options": {
+      "A": "該筆匯差應輸入在「借方」,類別應選擇「6.差額」。",
+      "B": "該筆匯差應輸入在「貸方」,類別應選擇「6.差 額」。",
+      "C": "該筆匯差應輸入在「借方」,類別應選擇「1.一般」。",
+      "D": "該筆匯差應輸入在「貸方」,類別應選擇 「1.一般」。"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 123,
+    "question": "資產資料建立作業中哪個欄位是該作業確認後,系統自動賦予的?",
+    "options": {
+      "A": "取得日期",
+      "B": "取得單號",
+      "C": "取得成本",
+      "D": "預留殘值"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 124,
+    "question": "以下在日常生活中所收到的單據,何者與「應付帳款明細表」具有最相似的性質?",
+    "options": {
+      "A": "百貨公司的 DM",
+      "B": "每月收到銀行信用卡的帳單",
+      "C": "個人綜合所得稅繳款單",
+      "D": "買東西時收到的統一發票"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 125,
+    "question": "票據系統使用外幣時抓取的匯率資料,在何系統建立?",
+    "options": {
+      "A": "票據資金管理系統",
+      "B": "管理維護系統",
+      "C": "出口貿易系統",
+      "D": "基本資料管理系統"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 126,
+    "question": "下列何張報表可以和銀行對帳?",
+    "options": {
+      "A": "資金預估明細表",
+      "B": "抵押借款明細表",
+      "C": "外幣存款月底重評價表",
+      "D": "銀行存款明細帳"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 127,
+    "question": "以下哪個票況不屬於「應收票據建立作業」可以看到的票況?",
+    "options": {
+      "A": "收票",
+      "B": "兌現",
+      "C": "託收",
+      "D": "開票"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 128,
+    "question": "會計傳票取消過帳、取消確認後進行修改,若修改完畢確認後要進行過帳,請問應執 行下列哪一支作業?",
+    "options": {
+      "A": "傳票整批過帳",
+      "B": "已過帳傳票重新過帳",
+      "C": "已過帳傳票還原",
+      "D": "傳票結轉"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 129,
+    "question": "銀行支票本建立作業中哪一個欄位會由系統更新,不需要手動輸入?",
+    "options": {
+      "A": "銀行代號",
+      "B": "起始支票號碼",
+      "C": "截止支票號碼",
+      "D": "已用支票號碼"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 130,
+    "question": "下列哪一個模組,與「應付管理系統」有關?",
+    "options": {
+      "A": "會計總帳管理系統",
+      "B": "採購管理系統",
+      "C": "票據資金管理系統",
+      "D": "以上皆是。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 131,
+    "question": "以下何者為「營業稅進銷項憑證」的蒐集方式?",
+    "options": {
+      "A": "手動在「進銷項憑證維護作業」輸入進銷項發票資料。",
+      "B": "執行「進項憑證產生作業」由系統自動擷取資料。",
+      "C": "執行「銷項憑證產生作業」由系統自動擷取資料。",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 132,
+    "question": "下列哪一種收款方式,不可以記錄在「收款單建立作業」裡?",
+    "options": {
+      "A": "現金收款",
+      "B": "支票收款",
+      "C": "銀行匯款",
+      "D": "抵押資產"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 133,
+    "question": "不影響資產帳務增減的異動項目為下列何者?",
+    "options": {
+      "A": "改良",
+      "B": "出售",
+      "C": "移轉",
+      "D": "折舊"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 134,
+    "question": "應付管理系統中,會計小姐拿來跟銀行存款異動核對的報表為何?",
+    "options": {
+      "A": "付款明細表",
+      "B": "應收票據明細表",
+      "C": "應付憑單明細表",
+      "D": "應付帳款明細表"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 135,
+    "question": "「結帳單」可記錄哪些交易事項?",
+    "options": {
+      "A": "銷貨應收",
+      "B": "銷退結帳",
+      "C": "其他賒帳收入",
+      "D": "以上皆是。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 136,
+    "question": "以下何者是輸入「會計傳票建立作業」單身「摘要」欄位的方法?",
+    "options": {
+      "A": "直接手動輸入",
+      "B": "可按「F2」功能鍵選取事先設定好的片語資料。",
+      "C": "可按「F3」功能鍵複製此張傳票前 幾筆,已有的摘要資料。",
+      "D": "以上皆是。"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 137,
+    "question": "關於「應付票據建立作業」,以下描述何者有誤?",
+    "options": {
+      "A": "可按 F2 開窗選擇未用的支票號碼",
+      "B": "銀行支票本建立作業會記錄已用支票號碼",
+      "C": "應付票據的票況需手動調整",
+      "D": "手動輸入的應付票據票號,須存在於「銀行支票本作業」中"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 138,
+    "question": "應付管理系統:下述哪一個輸入順序是正確的?",
+    "options": {
+      "A": "進貨單或退貨單->應付憑單->付款單",
+      "B": "進貨單或退貨單->付款單->應付憑單",
+      "C": "應付憑單->付款單->進貨單或退貨單",
+      "D": "應付憑單->進貨單或退貨單->付款單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 139,
+    "question": "若「財務參數設定」銀行存款現行年月為 2004/02,以下敘述何者為是?",
+    "options": {
+      "A": "表示不可修改 2004/02 的銀行存提款單",
+      "B": "表示已執行過 2004/02 的銀行存款月底結轉作業",
+      "C": "表示可以修改 2004/03 的銀行存提款單",
+      "D": "表示可以修改 2004/01 的銀行存提款單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 140,
+    "question": "我們可以利用資產資料中的哪個欄位來分別「列管列帳」和「列管不列帳」的資產?",
+    "options": {
+      "A": "資產類別",
+      "B": "型態",
+      "C": "資產編號",
+      "D": "管理區分"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 141,
+    "question": "請問能結帳至應付憑單的進貨單,其條件為何? A確認碼:Y B確認碼:N C結帳碼:N D結案碼:N",
+    "options": {
+      "A": "ACD",
+      "B": "AC",
+      "C": "BC",
+      "D": "BD"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 142,
+    "question": "下列關於「每月發票建立作業」的敘述,何者有誤?",
+    "options": {
+      "A": "為銷項單據發票開立的前置作業。",
+      "B": "可將每期向國稅局申購的銷項發票資料記錄於此作業。",
+      "C": "當開立銷項發票後,可至此作業補入指定開立的發票號碼。",
+      "D": "後續可於此作業查看發票開立的進度。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 143,
+    "question": "以下關於「資產資料建立作業」的描述,何者有誤?",
+    "options": {
+      "A": "當「資產資料建立作業」確認後,可將此資料轉至「資產取得單建立作業」。",
+      "B": "可記錄資產保管人及保管部門。",
+      "C": "可記錄資產的折舊方法。",
+      "D": "可記錄資產的投資抵減資料。"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 144,
+    "question": "對於應付帳款月底結轉作業敘述下列何者有誤?",
+    "options": {
+      "A": "將期末餘額結轉下期期初",
+      "B": "每個月都要執行結轉",
+      "C": "結轉後應付現行年月要手動設定下個月",
+      "D": "結轉後 會產生應付帳款月檔"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 145,
+    "question": "若是採取直接結帳方式,當進貨單確認時系統會自動產生哪種單據?",
+    "options": {
+      "A": "結帳單",
+      "B": "付款單",
+      "C": "發票號碼",
+      "D": "應付憑單"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 146,
+    "question": "關於「結帳單自動結帳作業」,下列描述何者正確?",
+    "options": {
+      "A": "只可以選擇「依統一結帳日」",
+      "B": "同客戶不同收款業務員可以分開結帳",
+      "C": "同客戶不同廠別的銷貨單不可以結在同一張結帳單",
+      "D": "不可以一張銷貨單產生一張結帳單"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 147,
+    "question": "關於「結帳單」的描述,何者有誤?",
+    "options": {
+      "A": "當「結帳單」確認後,表示應收帳款成立。",
+      "B": "「結帳單」輸入的資料,可以做為後續客戶應收帳款對 帳單的依據。",
+      "C": "可於此作業記錄現金銷貨的資料。",
+      "D": "一張「結帳單」可以結多筆銷貨單的貨款。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 148,
+    "question": "關於「應付憑單自動結帳作業」下列描述何者正確?",
+    "options": {
+      "A": "只可以選擇依廠商結帳日",
+      "B": "產生方式「整張」指的是將進貨單多個品項金額,結成彙總的一筆資料",
+      "C": "同廠商不同廠別的進貨單不可以結在同一張應付憑單",
+      "D": "不可以一張進貨單產生一張應付憑單"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 149,
+    "question": "列印「營業稅申報 401 表」前,需先輸入哪支作業?",
+    "options": {
+      "A": "進銷項憑證媒體產生作業",
+      "B": "國稅局營業稅媒體檢核作業",
+      "C": "彙總申報資料維護作業",
+      "D": "營業稅申報資料 建立作業"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 150,
+    "question": "下列何者為執行「進銷項憑證媒體產生作業」後所產生的檔案?",
+    "options": {
+      "A": "以「公司統一編號」命名的 TXT 檔",
+      "B": "以「公司統一編號」命名的 doc 檔",
+      "C": "以「公司稅籍編號」命名的 TXT 檔",
+      "D": "以「公司稅籍編號」命名的 doc 檔"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 151,
+    "question": "下列關於「應付憑單」的描述,何者有誤?",
+    "options": {
+      "A": "當「應付憑單」確認後,表示應付帳款成立",
+      "B": "「應付憑單」輸入的資料,可以做為後續與供應廠商核對應付帳款對帳的依據",
+      "C": "可於此作業記錄現金進貨的資料。",
+      "D": "可以一張進貨單結成一張「應付憑單」"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 152,
+    "question": "設定「資產資料建立作業」的「折舊分攤方式」,其主要目的為何?",
+    "options": {
+      "A": "若公司有做利潤中心管理,可設定折舊分攤方式,後續可依保管部門或固定比率彙 總各部門應分攤的折舊費用。",
+      "B": "可統計各資產保管人及保管部門資料。",
+      "C": "可分析資產的折舊方法。",
+      "D": "可將資產依內部管理或稅務資產分攤折舊。"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 153,
+    "question": "下列何種單據之單據性質設定作業可設定自動產生發票號碼?",
+    "options": {
+      "A": "進貨單",
+      "B": "結帳單",
+      "C": "銷貨單",
+      "D": "應付憑單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 154,
+    "question": "以下何者為執行「進銷項憑證媒體產生作業」後的結果?",
+    "options": {
+      "A": "系統會產生一個 EXCEL 檔。",
+      "B": "系統會產生一個圖形檔。",
+      "C": "系統會產生一個電子媒體檔。",
+      "D": "系統會直接將進銷項憑證資料寄到國稅局。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 155,
+    "question": "從開票給供應廠商,一直到該票據金額從銀行帳戶扣除,以下何者可以描述該票據票 況之變化?",
+    "options": {
+      "A": "開票->註銷->兌現",
+      "B": "開票->兌現->還票",
+      "C": "開票->還票->兌現",
+      "D": "開票->兌現"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 156,
+    "question": "今年 8 月 1 日票據系統欲正式上線,請問導入銀行存款期初餘額時,現行年月應設定 何月份?",
+    "options": {
+      "A": "今年8月",
+      "B": "今月9月",
+      "C": "今年7月",
+      "D": "不用設立"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 157,
+    "question": "從收到客戶之應收票據,一直到該票據兌現入帳,以下何者可以描述該票據票況之變 化?",
+    "options": {
+      "A": "收票->託收->兌現",
+      "B": "收票->兌現->託收",
+      "C": "開票->託收->兌現",
+      "D": "開票->兌現->託收"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 158,
+    "question": "固定資產盤點流程下列何者正確? 甲.盤點清單 乙.實地盤點 丙.盤點資料建立 丁.盤點資料產生",
+    "options": {
+      "A": "丁甲乙丙",
+      "B": "丁乙丙甲",
+      "C": "乙丙丁甲",
+      "D": "甲乙丙丁"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 159,
+    "question": "若本公司有購買「營業稅申報系統」,則應付系統「單據性質設定作業」中,下列哪 一種性質的單 據其營業稅申報公司代號不可空白?",
+    "options": {
+      "A": "應付憑單",
+      "B": "預付待抵單",
+      "C": "付款單",
+      "D": "溢付待抵憑單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 160,
+    "question": "下列有關結帳和收款的敘述,何者有誤?",
+    "options": {
+      "A": "一張結帳單可以分次收款",
+      "B": "一張收款單可以沖多筆帳款",
+      "C": "未確認的結帳單不可收款沖帳",
+      "D": "收款單只允許相同幣別的收款沖帳"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 161,
+    "question": "下列關於「應付管理系統」的描述,何者有誤?",
+    "options": {
+      "A": "可擷取採購管理系統的進貨單及退貨單,作為應付憑單的來源",
+      "B": "「應付管理系統」只須輸入兩種單據, 應付憑單及付款單。",
+      "C": "可記錄賒帳進貨單及現金進貨單資料於「應付憑單建立作業」,以掌握公司的流動 資負債狀況。",
+      "D": "應付憑單的目的在於立帳,付款單的目的在於沖帳。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 162,
+    "question": "應收管理系統:下述哪一個輸入順序是正確的?",
+    "options": {
+      "A": "銷貨單或銷退單->結帳單->收款單",
+      "B": "銷貨單或銷退單->收款單->結帳單",
+      "C": "結帳單->收款單->銷貨單或 銷退單",
+      "D": "結帳單->銷貨單或銷退單->收款單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 163,
+    "question": "「進項憑證產生作業」執行後,在「進銷項憑證維護作業」找不到進項資料,可能原 因為下列何者?",
+    "options": {
+      "A": "應付憑單未確認",
+      "B": "應付憑單發票日期空白",
+      "C": "應付憑單單據性質未設定申報公司代號",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 164,
+    "question": "關於「銀行支票本建立作業」,以下描述何者有誤?",
+    "options": {
+      "A": "支票本可以有多本,建立時輸入不同的使用順序碼即可",
+      "B": "應付票據票號應事先於「銀行支票本建立作 業」中輸入,方能開立支票",
+      "C": "已用支票號碼需手動輸入",
+      "D": "起始支票號碼需手動輸入"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 165,
+    "question": "關於資產資料的描述下列何者有誤?",
+    "options": {
+      "A": "資產異動作業執行後,資產資料不可以取消確認",
+      "B": "銷帳日期可於資產報廢時由系統回寫",
+      "C": "未攤月數是按月手動輸入",
+      "D": "資產類別不可以空白"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 166,
+    "question": "如果要執行「銷項憑證產生作業」,由系統自動擷取資料,下列何種單據可以作為此 作業抓取資料 的來源?",
+    "options": {
+      "A": "結帳單",
+      "B": "應付憑單",
+      "C": "收款單",
+      "D": "付款單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 167,
+    "question": "下列關於「應收管理系統」的描述,何者為非?",
+    "options": {
+      "A": "可擷取訂單管理系統的銷貨單及銷退單,作為結帳單的來源單據。",
+      "B": "「應收管理系統」只須輸入兩種單據,結帳單及收款單。",
+      "C": "可記錄賒銷及現銷的資料於「結帳單建立作業」,以掌握公司的流動資產狀況。",
+      "D": "結帳單的目的在於立帳,收款單的目的在於沖帳。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 168,
+    "question": "會計傳票無法過帳的原因下列何者有誤?",
+    "options": {
+      "A": "借貸不平",
+      "B": "該月傳票尚未月結",
+      "C": "會計期間未設定",
+      "D": "傳票未確認"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 169,
+    "question": "如果要執行「進項憑證產生作業」,由系統自動擷取資料,下列何種單據可以作為此 作業抓取資料 的來源?",
+    "options": {
+      "A": "結帳單",
+      "B": "應付憑單",
+      "C": "收款單",
+      "D": "付款單"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 170,
+    "question": "下列固定資產異動的敘述何者有誤?",
+    "options": {
+      "A": "資產改良後會影響原資產資料",
+      "B": "資產若已產生折舊單,則原資產資料不得取消確認",
+      "C": "資產銷帳日期一定要手動輸入",
+      "D": "資產折舊單可由系統產生"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 171,
+    "question": "應收票據建立作業中,預兌日如何計算而來的?",
+    "options": {
+      "A": "開票日+入帳日數",
+      "B": "結帳日+入帳日數",
+      "C": "到期日+入帳日數",
+      "D": "付款日+入帳日數"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 172,
+    "question": "以下何種作業順序為採買「固定資產」之標準流程?",
+    "options": {
+      "A": "資產詢價->資產請購->資產採購>資產進貨",
+      "B": "資產請購->資產採購->資產詢價->資產進貨",
+      "C": "資產請購-> 資產詢價->資產採購->資產進貨",
+      "D": "資產請購->資產採購->資產進貨->資產詢價"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 173,
+    "question": "關於「結帳單自動結帳作業」,下列描述何者正確?",
+    "options": {
+      "A": "產生方式「整張」指的是只產生一張結帳單",
+      "B": "產生方式「逐筆」指的是將銷貨單多個品項金額,結成彙總的一筆資料",
+      "C": "產生方式「整張」指的是將銷貨單多個品項金額,結成彙總的一筆資料",
+      "D": "產生方式「逐筆」指的是產生多張結帳單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 174,
+    "question": "下列關於結帳單的描述何者為是?",
+    "options": {
+      "A": "結帳單的已收金額是自己輸入的",
+      "B": "未確認的結帳單仍可收款沖帳",
+      "C": "單身來源若為「其他」,仍須輸入憑證單別、單號",
+      "D": "結帳單的「結案碼」是系統回寫的"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 175,
+    "question": "關於自動結帳方式的說明下列何者有誤?",
+    "options": {
+      "A": "結帳期間選擇方式分為統一結帳日及依客戶結帳日兩種",
+      "B": "「結帳單自動結帳作業」只能處理銷貨單及銷退單兩種",
+      "C": "「結帳單自動結帳作業」也可以處理非銷貨的其他帳款",
+      "D": "「結帳單自動結帳作業」可以處理不同廠別的貨款"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 176,
+    "question": "若是隨貨附發票的應收帳款,發票資料在何種單據輸入較為適當?",
+    "options": {
+      "A": "銷貨單",
+      "B": "結帳單",
+      "C": "收款單",
+      "D": "以上單據都要輸入"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 177,
+    "question": "外銷的銷貨單,若不開立發票時,其發票聯數應為何?",
+    "options": {
+      "A": "三聯式",
+      "B": "二聯式",
+      "C": "免用統一發票",
+      "D": "電子計算機發票"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 178,
+    "question": "下列有關『收款單建立作業』的描述何者為非?",
+    "options": {
+      "A": "一筆結帳單可以分批收款",
+      "B": "立帳金額是結帳單的金額",
+      "C": "立帳餘額是目前還沒收款的餘額",
+      "D": "收到票據時,應該在發票號碼輸入支票號碼"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 179,
+    "question": "客戶未結帳的銷貨單有 1/29、2/3、2/15、2/26,執行「結帳單自動結帳作業-依客 戶結帳日(25 號)」 結 2 月帳款,下列敘述何者正確?",
+    "options": {
+      "A": "四張銷貨單都納入結帳",
+      "B": "1/29 的銷貨單不會納入結帳",
+      "C": "四張銷貨單都不會納入結帳",
+      "D": "只有 1/29、2/3、 2/15 會納入結帳"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 180,
+    "question": "若營業稅申報公司有兩個以上,請問其申報公司基本資料應從何作業中輸入?",
+    "options": {
+      "A": "公司資料建立作業",
+      "B": "多公司資料建立",
+      "C": "稅籍資料建立作業",
+      "D": "以上皆可"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 181,
+    "question": "若付款單單身貸方類別為「一般」(銀行存款),則參考單號應輸入下列何種資料?",
+    "options": {
+      "A": "應付票據票號",
+      "B": "銀行提款單單別單號",
+      "C": "進貨單單號",
+      "D": "應付憑單單號"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 182,
+    "question": "關於「銀行存款存提作業」的描述,下列何者有誤?",
+    "options": {
+      "A": "存款單及提款單皆是在「銀行存款存提作業」輸入",
+      "B": "可以在「銀行存款存提作業」記錄本公司各銀行帳戶的轉帳資料",
+      "C": "若要輸入存款的資料,須至「銀行存款作業」輸入;若要輸入提款的資料,則須至 「銀行提款作業」輸入資料",
+      "D": "可以在「銀行存款存提作業」記錄各種幣別的存提款資料"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 183,
+    "question": "票據系統若當月所有異動單據皆輸入齊全且存款餘額核對無誤,應執行何作業?",
+    "options": {
+      "A": "存款月底結轉作業",
+      "B": "票據清除作業",
+      "C": "銀行存款重計作業",
+      "D": "以上皆非"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 184,
+    "question": "「結帳單自動結帳作業-依客戶結帳日」,若客戶結帳日為 26 日,「逐張結帳日期同 銷(退)貨日期」選 項不勾選,則產生的 1 月份結帳單單據日期為何?",
+    "options": {
+      "A": "1 月 31 日",
+      "B": "1 月 25 日",
+      "C": "1 月 26 日",
+      "D": "2 月 26 日"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 185,
+    "question": "銷貨資料欲「直接結帳」要在哪一種單據的性質設定進行設定?",
+    "options": {
+      "A": "結帳單",
+      "B": "訂單",
+      "C": "銷貨單",
+      "D": "報價單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 186,
+    "question": "關於「進銷項憑證維護作業」下列描述何者有誤?",
+    "options": {
+      "A": "「來源方式」為「拋轉」,表示是由其他系統拋轉過來",
+      "B": "可選擇的「課稅別」有「應稅內含、應稅外 加、零稅率、免稅及作廢」",
+      "C": "若為「銷項憑證」則可選擇「可扣抵之進貨及費用或固定資產」",
+      "D": "由系統拋轉過來的進銷項憑證,會記錄來源單別、單號"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 187,
+    "question": "關於「結帳單」單頭「發票資料」頁面的描述,何者有誤?",
+    "options": {
+      "A": "所謂「發票資料」,包含發票日期、發票號碼、發票聯數、課稅別等資料。",
+      "B": "針對未確認的結帳單, 可以利用工具列上之「發票資料修改」鈕,補入發票資料。",
+      "C": "若為隨貨附發票,在銷貨時已記錄發票資 料,所以結帳時系統會將發票資料自動帶 至結帳單上",
+      "D": "若不為隨貨附發票,則在結帳單上可以補入發票資料。"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 188,
+    "question": "在應付系統中的基本資料建立,哪個作業的設定會影響公司資金預估(支出)?",
+    "options": {
+      "A": "會計科目設定",
+      "B": "廠商資料建立",
+      "C": "付款條件建立",
+      "D": "單據性質設定"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 189,
+    "question": "若付款單單身貸方類別為「票據」,則參考單號應輸入下列何種資料?",
+    "options": {
+      "A": "應付票據票號",
+      "B": "進貨單單號",
+      "C": "應付憑單單號",
+      "D": "廠商代號"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 190,
+    "question": "若結帳單應收金額希望能核對每項銷貨品項之金額,則產生結帳單的方式應該如何選 擇?",
+    "options": {
+      "A": "整張結帳",
+      "B": "逐筆結帳",
+      "C": "一張銷(退)貨單產生一張結帳單",
+      "D": "手動結帳"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 191,
+    "question": "關於會計系統常用傳票的描述下列何者是正確的?",
+    "options": {
+      "A": "可至常用傳票建立作業",
+      "B": "常用傳票只能是轉帳傳票",
+      "C": "金額不可以輸入",
+      "D": "系統沒有提供常用傳票的功能"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 192,
+    "question": "關於會計系統傳票過帳處理,下列敘述何者是正確的?",
+    "options": {
+      "A": "已過帳傳票過帳碼會打勾",
+      "B": "借貸不平衡的傳票仍可過帳",
+      "C": "傳票輸入後不需過帳處理",
+      "D": "以上皆是"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 193,
+    "question": "關於財務參數設定中的『會計關帳年度、期別』描述,下列何者有誤?",
+    "options": {
+      "A": "用來管制會計傳票不可異動的年月",
+      "B": "會計師查核過財務報表後執行關帳",
+      "C": "透過指定關帳作業更新會計關帳年度期別",
+      "D": "目前系統處理會計帳務的期別"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 194,
+    "question": "「會計傳票建立作業」中,部門可不可以空白?",
+    "options": {
+      "A": "可以",
+      "B": "不可以",
+      "C": "視科目資料建立的設定",
+      "D": "以上皆非"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 195,
+    "question": "會計傳票建立時,單身『部門代號』欄位的描述內容,下列何者有誤?",
+    "options": {
+      "A": "用來記錄費用發生部門",
+      "B": "可產出部門別損益表",
+      "C": "該科目須設定為部門管理",
+      "D": "用來記錄傳票建立人員之部門"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 196,
+    "question": "傳票修改且作確認後,則下一步驟應執行何作業?",
+    "options": {
+      "A": "已過帳傳票重新過帳",
+      "B": "傳票整批過帳",
+      "C": "已過帳傳票還原",
+      "D": "以上皆非"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 197,
+    "question": "欲檢視目前會計傳票是否有借貸不平衡者,應列印那張報表?",
+    "options": {
+      "A": "傳票憑證",
+      "B": "明細分類帳",
+      "C": "會計傳票明細表",
+      "D": "日計帳"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 198,
+    "question": "對於科目部門設限建立作業,下列何者有誤?",
+    "options": {
+      "A": "若是不設限部門則截止部門代號空白",
+      "B": "若是不設限部門則起始部門代號空白",
+      "C": "有做部門管理的科目才可以設定限定部門",
+      "D": "若是不設限部門則截止部門代號以6位Z表示"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 199,
+    "question": "傳票的輸入下列何者有誤?",
+    "options": {
+      "A": "傳票可以記載外幣交易金額",
+      "B": "傳票單身複製上一筆是按F2的功能鍵",
+      "C": "傳票單身插入一筆要利用CTRL+DEL",
+      "D": "傳票單身複製上一筆摘要是利用F3按鍵"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 200,
+    "question": "現金收入傳票的單身要輸入的是哪種科目?",
+    "options": {
+      "A": "借方科目",
+      "B": "借貸方都可以",
+      "C": "空白不輸入",
+      "D": "貸方科目"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 201,
+    "question": "會計報表記載的是何種狀況的傳票?",
+    "options": {
+      "A": "已確認",
+      "B": "已過帳的",
+      "C": "已還原過帳的",
+      "D": "已重新過帳的"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 202,
+    "question": "關於『結帳單自動結帳作業』,下列描述何者正確?",
+    "options": {
+      "A": "同客戶不同收款業務員可以分開結帳",
+      "B": "不可以一張銷貨單產生一張結帳單",
+      "C": "只可以選擇『依統一結帳日』",
+      "D": "同客戶不同廠別的銷貨單不可以結在同一張結帳單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 203,
+    "question": "關於結帳單的描述何者為是?",
+    "options": {
+      "A": "結帳單的已收金額是自己輸入的",
+      "B": "未確認的結帳單仍可收款沖帳",
+      "C": "單身來源若為「銷貨」 ,必須輸入憑證單別、單號",
+      "D": "以上皆非"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 204,
+    "question": "應收帳款結帳的條件,下列何者正確? 甲.已確認未結帳銷貨單 乙.已確認未結帳銷退單 丙.已確認未結帳現銷單 丁.已確認已結帳銷貨單",
+    "options": {
+      "A": "甲乙丙",
+      "B": "甲乙",
+      "C": "甲乙丁",
+      "D": "甲乙丙丁"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 205,
+    "question": "客戶結帳日為25日,若依客戶結帳日處理結帳年月2010/01的銷退貨資料,下列銷退 貨日期範圍正確?",
+    "options": {
+      "A": "2009/12/26~2010/01/25",
+      "B": "2010/01/25~2010/01/25",
+      "C": "2010/01/01~2010/01/25",
+      "D": "2009/12/25~2010/01/25"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 206,
+    "question": "關於收款單的描述以下何者是對的?",
+    "options": {
+      "A": "不同廠別的結帳單不可合併收款沖帳",
+      "B": "不同幣別的結帳單可合併收款沖帳",
+      "C": "收款單存檔時不會檢查借貸金額不平",
+      "D": "收到客戶銀行存款時,於借方、類別選票據輸入收款資料"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 207,
+    "question": "「付款條件建立作業」推算預計收/付款日的結果,會顯示在下列哪一張單據裡?",
+    "options": {
+      "A": "銷貨單",
+      "B": "應收票據",
+      "C": "結帳單",
+      "D": "收款單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 208,
+    "question": "「結帳單自動結帳作業」,不包含下列何單據?",
+    "options": {
+      "A": "資產出售",
+      "B": "銷貨單",
+      "C": "銷退單",
+      "D": "以上皆非"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 209,
+    "question": "「結帳單建立作業」中,預計兌現日如何得知?",
+    "options": {
+      "A": "自行輸入",
+      "B": "客戶基本資料結帳日,付款條件推算出",
+      "C": "系統沒有推算",
+      "D": "無此欄位"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 210,
+    "question": "結帳單的結案碼是用來表示,下列何者有問題?",
+    "options": {
+      "A": "已結案表示應收款項全數收回",
+      "B": "已收金額 = 應收金額時會呈現已結案",
+      "C": "已結案的帳單就不須追蹤",
+      "D": "尚未收回的帳款可以手動結案"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 211,
+    "question": "「收款單建立作業」中,關於單頭幣別欄位下列何者有誤?",
+    "options": {
+      "A": "若空白,表示同時收款多種幣別",
+      "B": "若空白,表示同時沖銷多幣別帳款",
+      "C": "單頭單身幣別可以不同",
+      "D": "單頭若為台幣則單身一定要為台幣"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 212,
+    "question": "「收款單建立作業」中,關於參考單號的欄位下列何者有誤?",
+    "options": {
+      "A": "可以輸入傳票號碼串聯會計系統",
+      "B": "可以輸入票號串聯票據系統記載",
+      "C": "可以輸入存款單號串連銀行存提作業",
+      "D": "收款方式若為現金則不需輸入參考單號"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 213,
+    "question": "應收系統中方便客戶核對帳款的報表是?",
+    "options": {
+      "A": "收款單明細表",
+      "B": "應收帳款對帳單",
+      "C": "業務員帳款明細表",
+      "D": "結帳單明細表"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 214,
+    "question": "請問能結帳至應付憑單的進貨單,其條件為何? (1)確認碼:Y (2)確認碼:N (3)結帳碼:N (4)結案碼:N",
+    "options": {
+      "A": "( 2 )( 3 )",
+      "B": "( 1 )( 3 )( 4 )",
+      "C": "( 2 )( 4 )",
+      "D": "( 1 )( 3 )"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 215,
+    "question": "關於付款單的描述以下何者是錯的?",
+    "options": {
+      "A": "不同廠別的應付憑單可以合併付款",
+      "B": "付款單類別為沖帳,則立帳金額不可修改",
+      "C": "不同幣別的應付憑單可合併付款",
+      "D": "付款單存檔時允許金額借貸不平"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 216,
+    "question": "關於「應付帳款月底結轉作業」,下列描述何者有誤?",
+    "options": {
+      "A": "月結後應付現行年月加一",
+      "B": "不可確認、取消確認小於應付現行年月的應付憑單或付款單",
+      "C": "可以確認、取消確認應付現行年月的應付憑單或付款單",
+      "D": "應付系統不提供月結作業"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 217,
+    "question": "應付系統批次作業中「應付憑單自動結帳」不含何來源?",
+    "options": {
+      "A": "進/退貨",
+      "B": "託外進/退貨",
+      "C": "購入資產",
+      "D": "以上皆是"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 218,
+    "question": "若該廠商應付帳款固定為每月月底結帳,在「供應廠商資料建立作業」結帳日應如何設 定?",
+    "options": {
+      "A": "統一設30日",
+      "B": "統一設31日",
+      "C": "視當月份為大月或小月自行修改",
+      "D": "空白"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 219,
+    "question": "應付系統「單據性質建立作業」其單據為何種性質時,會計科目可不必輸入?",
+    "options": {
+      "A": "應付憑單單據",
+      "B": "預付應付憑單",
+      "C": "付款單據",
+      "D": "預付結帳單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 220,
+    "question": "『應付憑單建立作業』單頭有一個【凍結付款】鈕,以下描述何者正確?",
+    "options": {
+      "A": "凍結付款可由系統啟動,如果有進貨單被作廢就會啟動",
+      "B": "凍結付款如果要取消,再執行一次結帳作業就好",
+      "C": "欲付款時將凍結付款取消即可",
+      "D": "凍結付款後要等一下個月才能支付款項"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 221,
+    "question": "付款單會產生差額的原因,通常是?",
+    "options": {
+      "A": "匯差",
+      "B": "溢收",
+      "C": "手續費",
+      "D": "進貨折讓"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 222,
+    "question": "進貨驗收日為7/18,廠商結帳日為月底,付款條件為『結帳日起算次月20日付款,付 款日起算票期30天』,請問推算出來的預計付款日為何?",
+    "options": {
+      "A": "9/20",
+      "B": "9/19",
+      "C": "8/31",
+      "D": "8/20"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 223,
+    "question": "想得知某一個時點公司應該準備多少資金支付廠商,我們該使用哪張報表?",
+    "options": {
+      "A": "付款單明細表",
+      "B": "模擬付款明細表",
+      "C": "應付帳款明細表",
+      "D": "應付憑單明細表"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 224,
+    "question": "哪種狀況銀行存款會增加?",
+    "options": {
+      "A": "提款單確認",
+      "B": "應付票據兌現",
+      "C": "應收票據兌現",
+      "D": "以上皆是"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 225,
+    "question": "當應付票據兌現時,會計傳票分錄下列何者有誤?",
+    "options": {
+      "A": "貸方科目為銀行存款科目",
+      "B": "借方科目為應付票據",
+      "C": "應付票據兌現無須切立傳票分錄",
+      "D": "以上皆非"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 226,
+    "question": "關於「銀行支票本建立作業」,以下描述何者有誤?",
+    "options": {
+      "A": "支票本可以有多本,建立時輸入不同的使用順序碼即可",
+      "B": "「應付票據建立作業」輸入時若票號沒有事先於「銀行支票本建立作業」中輸入, 仍能開立支票",
+      "C": "已用支票號碼不需手動輸入",
+      "D": "起始支票號碼需手動輸入"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 227,
+    "question": "關於「應付票據建立作業」,以下描述何者有誤?",
+    "options": {
+      "A": "可按F2開窗選擇未用的支票號碼",
+      "B": "應付票據票號會記錄於銀行支票本建立作業的已用支票號碼",
+      "C": "應付票據的票況由系統更新",
+      "D": "手動輸入的應付票據票號 ,不須存在於「銀行支票本作業」的起迄號碼"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 228,
+    "question": "影響銀行存款餘額異動,請問有那些作業?",
+    "options": {
+      "A": "銀行存款存提作業",
+      "B": "應付票據兌現",
+      "C": "應收票據兌現",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 229,
+    "question": "今年10月票據系統欲正式上線,請問導入銀行存款月底餘額時,現行年月應以何月份來 輸入?",
+    "options": {
+      "A": "今年十月",
+      "B": "今月九月",
+      "C": "今年十一月",
+      "D": "不用設立"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 230,
+    "question": "應收票據中入帳日數的描述下列何者正確?",
+    "options": {
+      "A": "可以推算預兌日",
+      "B": "可以推算收票日",
+      "C": "可以推算開票日",
+      "D": "可以推算到期日"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 231,
+    "question": "下列何者是銀行存提作業的類別碼",
+    "options": {
+      "A": "轉帳",
+      "B": "收票",
+      "C": "開票",
+      "D": "匯款"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 232,
+    "question": "下列何者不是應收票據之票況?",
+    "options": {
+      "A": "收票",
+      "B": "開票",
+      "C": "託收",
+      "D": "轉付"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 233,
+    "question": "用來跟銀行核對存款餘額的報表是?",
+    "options": {
+      "A": "銀行存提明細表",
+      "B": "應收票據到期明細表",
+      "C": "銀行存款明細帳",
+      "D": "應付票據到期明細表"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 234,
+    "question": "檢視某一個時間點還有多少庫存票(票況為收票),可以使用下列哪張報表?",
+    "options": {
+      "A": "銀行存款明細帳",
+      "B": "應收票據到期明細表",
+      "C": "應付票據票況表",
+      "D": "應收票據票況表"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 235,
+    "question": "下列固定資產的敘述何者正確?",
+    "options": {
+      "A": "資產改良後不會影響原資產資料",
+      "B": "資產若已產生折舊單,則原資產資料不得取消",
+      "C": "資產取得單需自行輸入",
+      "D": "以上皆非"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 236,
+    "question": "下列固定資產的敘述何者是正確的?",
+    "options": {
+      "A": "累積折舊需自己計算填入",
+      "B": "系統折舊方法只有提供平均法",
+      "C": "帳面價值不需手動輸入",
+      "D": "以上皆非"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 237,
+    "question": "下列關於資產移轉敘述何者有誤?",
+    "options": {
+      "A": "一張資產移轉單不可做多筆資產之移轉",
+      "B": "可移轉保管部門",
+      "C": "可移轉保管人員",
+      "D": "系統提供整批移轉的功能"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 238,
+    "question": "固定資產資料確認後,利用哪一功能可補入「投資抵減」相關資料?",
+    "options": {
+      "A": "修改鈕",
+      "B": "取消確認鈕",
+      "C": "資產資料修改鈕",
+      "D": "新增資產調整單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 239,
+    "question": "固定資產盤點流程下列何者正確? (1)盤點清單 (2)實地盤點 (3)盤點資料建立 (4)盤點資料產生",
+    "options": {
+      "A": "(1)(2)(3)(4)",
+      "B": "(2)(3)(4)(1)",
+      "C": "(4)(2)(3)(1)",
+      "D": "(4)(1)(2)(3)"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 240,
+    "question": "固定資產的請採購流程步驟為: (A)資產採購單建立 (B)資產詢價單建立 (C)資產進貨單建立 (D)資產請購資料維護 (E)資產請購資料更新 (F)進貨資料合併/拆解賦予資產編號 (G)資產請購單建立",
+    "options": {
+      "A": "ABCDEF",
+      "B": "GBDEACF",
+      "C": "GBDACEF",
+      "D": "ABDEGCF"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 241,
+    "question": "以下何者不是「資產資料建立作業」裡可以選擇的折舊方法?",
+    "options": {
+      "A": "工作時間法",
+      "B": "平均法",
+      "C": "定率遞減法",
+      "D": "可不提折舊"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 242,
+    "question": "下列有關固定資產折舊的敘述何者是正確的?",
+    "options": {
+      "A": "累積折舊需自己計算填入",
+      "B": "帳面價值跟折舊攤提沒有關係",
+      "C": "系統折舊方法只有提供平均法",
+      "D": "帳面價值不需手動輸入"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 243,
+    "question": "欲將同一員工項下所有資產移轉給一位新進員工,如何快速輸入移轉單據?",
+    "options": {
+      "A": "資產整批移轉功能鈕",
+      "B": "重計預留殘值功能鈕",
+      "C": "資產資料修改功能鈕",
+      "D": "重計月折舊額功能鈕"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 244,
+    "question": "「進項憑證產生作業」後,在「進銷項憑證維護作業」找不到進項資料,原因為何?",
+    "options": {
+      "A": "應付憑單未確認",
+      "B": "應付憑單發票日期空白",
+      "C": "應付憑單單據性質未設定申報公司代號",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 245,
+    "question": "關於「進銷項憑證維護作業」下列描述何者有誤?",
+    "options": {
+      "A": "「來源方式」為「人工」,表示是由其他系統拋轉過來",
+      "B": "可選擇的「課稅別」有「應稅內含、應稅外加、零稅率、免稅及作廢」",
+      "C": "若為「進項憑證」則可選擇「可扣抵之進貨及費用或固定資產」",
+      "D": "由系統拋轉過來的進銷項憑證,會記錄來源單別、單號"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 246,
+    "question": "下列何者為執行『進銷項憑證媒體產生作業』後所產生的檔案?",
+    "options": {
+      "A": "以『公司稅籍編號』命名的TXT檔",
+      "B": "以『公司稅籍編號』命名的doc檔",
+      "C": "以『公司統一編號』命名的TXT檔",
+      "D": "以『公司統一編號』命名的doc檔"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 247,
+    "question": "若營業稅申報公司有兩個以上,請問其申報公司基本資料應從何作業中輸入?",
+    "options": {
+      "A": "多公司資料建立作業",
+      "B": "稅籍資料建立作業",
+      "C": "公司資料建立作業",
+      "D": "以上皆要輸入"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 248,
+    "question": "若本公司有購買「營業稅媒體申報系統」,則應付系統「單據性質設定作業」中,營 業稅申報公司代號在何種單?",
+    "options": {
+      "A": "付款單",
+      "B": "預付結帳單",
+      "C": "應付憑單",
+      "D": "溢付待抵憑單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 249,
+    "question": "將貨品出口至國外,若手動將該銷項資料填入營業稅申報 系統,下列何者有誤?",
+    "options": {
+      "A": "「課稅別」應為零稅率",
+      "B": "《零稅率出口文件》頁籤須輸入相關文件資料",
+      "C": "「買方統編」應填入客戶代號",
+      "D": "「格式代號」應為36.銷項免用發票"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 250,
+    "question": "公司每月或每期向稽徵單位購買之發票本資料須建立在",
+    "options": {
+      "A": "進銷項憑證維護作業",
+      "B": "營業稅申報資料",
+      "C": "統一發票明細表",
+      "D": "每月發票建立作 業"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 251,
+    "question": "下列哪一張ERP系統應收票據之報表可作為資金調度及逾期票款催收的依據",
+    "options": {
+      "A": "資金預估明細表",
+      "B": "應收票據票況表",
+      "C": "應收票據到期明細表",
+      "D": "銀行存款明細帳"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 252,
+    "question": "關於『結帳單自動結帳作業』,下列描述何者正確?",
+    "options": {
+      "A": "只可以選擇『依統一結帳日』",
+      "B": "同客戶不同收款業務員可以分開結帳",
+      "C": "同客戶不同廠別的銷貨單不可以結在同一張結帳單",
+      "D": "不可以一張銷貨單產生一張結帳單"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 253,
+    "question": "應收帳款結帳的條件,下列何者正確? 甲.已確認未結帳銷貨單 乙.已確認未結帳銷退單 丙.已確認未結帳現銷單 丁.已確認已結帳銷貨單",
+    "options": {
+      "A": "甲乙丙丁",
+      "B": "甲乙丁",
+      "C": "甲乙丙",
+      "D": "甲乙"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 254,
+    "question": "客戶結帳日為25日,若依客戶結帳日處理結帳年月2019/01的銷退貨資料,下列銷退 貨日期範圍正確?",
+    "options": {
+      "A": "2019/01/01~2019/01/25",
+      "B": "2019/01/25~2019/01/25",
+      "C": "2009/12/25~2019/01/25",
+      "D": "2018/12/26~2019/01/25"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 255,
+    "question": "有關「收款單建立作業」描述,下列何者有誤?",
+    "options": {
+      "A": "立帳幣別若為台幣,只能收款台幣",
+      "B": "收款與立帳廠別可以不同",
+      "C": "收款金額將回寫至結帳單,記錄收款狀況",
+      "D": "收款單可同時記錄多筆沖帳資料"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 256,
+    "question": "有關『結帳單自動結帳作業』的來源何者為是 A.銷貨單 B.銷退單 C.借出單 D.寄賣單",
+    "options": {
+      "A": "ABCD",
+      "B": "AB",
+      "C": "ABC",
+      "D": "BC"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 257,
+    "question": "以下何者是『結帳單』結帳的方式?",
+    "options": {
+      "A": "人工手動結帳",
+      "B": "自動結帳",
+      "C": "直接結帳",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 258,
+    "question": "手動建立訂金的預收結帳單後,系統會自動產生哪種單據?",
+    "options": {
+      "A": "結帳單",
+      "B": "收款單",
+      "C": "預收待抵",
+      "D": "銷貨單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 259,
+    "question": "銷貨資料欲『直接結帳』要在哪一種單據的性質設定進行設定?",
+    "options": {
+      "A": "結帳單",
+      "B": "訂單",
+      "C": "銷貨單",
+      "D": "報價單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 260,
+    "question": "若收款單單身類別為「票據」則參考單號應輸入",
+    "options": {
+      "A": "銷貨單單號",
+      "B": "客戶代號",
+      "C": "應收票據票號",
+      "D": "結帳單號"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 261,
+    "question": "下列哪張報表最適合做為每月寄發給客戶,與客戶對帳使用的報表?",
+    "options": {
+      "A": "客戶帳款明細表",
+      "B": "應收帳款對帳單",
+      "C": "客戶帳款催收管制表",
+      "D": "業務員帳款明細表"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 262,
+    "question": "請問能結帳至應付憑單的進貨單,其條件為何? (1)確認碼:Y (2)確認碼:N (3)結帳碼:N (4)結案碼:N",
+    "options": {
+      "A": "(1)(3)(4)",
+      "B": "(1)(3)",
+      "C": "(2)(3)",
+      "D": "(2)(4)"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 263,
+    "question": "關於付款單的描述,以下何者是對的?",
+    "options": {
+      "A": "不同廠別的應付憑單不可合併付款",
+      "B": "付款單類別為沖帳,則立帳金額可修改",
+      "C": "付款單類別為沖帳,則立帳餘額需自己輸入",
+      "D": "不同幣別的應付憑單可合併付款"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 264,
+    "question": "付款單類別『差額』,通常發生原因是?",
+    "options": {
+      "A": "進貨折讓",
+      "B": "預付",
+      "C": "匯差",
+      "D": "退貨金額"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 265,
+    "question": "會影響票據資金系統銀行存款餘額變動的作業,下列何者為非?",
+    "options": {
+      "A": "銀行存款存提作業",
+      "B": "應付票據兌現",
+      "C": "應收票據託收",
+      "D": "應收票據兌現"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 266,
+    "question": "若會計傳票借貸不平衡要儲存,可以透過哪一系統作業設定?",
+    "options": {
+      "A": "會計期間設定作業",
+      "B": "會計參數設定作業",
+      "C": "會計科目設定作業",
+      "D": "財務參數設定作業"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 267,
+    "question": "在下列哪一個ERP系統作業中定義統制帳戶、獨立帳戶及明細帳戶?",
+    "options": {
+      "A": "會計期間設定作業",
+      "B": "科目資料建立作業",
+      "C": "會計參數設定作業",
+      "D": "會計傳票建立作業"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 268,
+    "question": "當傳票種類為現支傳票時,下列說明何者正確?",
+    "options": {
+      "A": "單身對方科目須為借方",
+      "B": "單身對方科目須為貸方",
+      "C": "單頭收支科目一般多為費用類科目",
+      "D": "現支傳票可以借貸不平"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 269,
+    "question": "『會計傳票』輸入後要在什麼狀態下,才會納入報表計算?",
+    "options": {
+      "A": "只要輸入就可",
+      "B": "已確認的會計傳票即可",
+      "C": "已確認且已過帳的會計傳票",
+      "D": "已確認且未結案的會計傳票"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 270,
+    "question": "以下哪一個分錄性質設定作業,不需設定會計科目,系統會自動抓取單據上的會科?",
+    "options": {
+      "A": "分錄性質設定-收款單",
+      "B": "分錄性質設定-銷貨單",
+      "C": "分錄性質設定-結帳單",
+      "D": "分錄性質設定-銷退單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 271,
+    "question": "原始單據已將分錄產生至會計傳票,才發現原始單據有誤必須修改, 執行順序為何 (1) 還原會計傳票 (2) 傳票還原過帳及取消確認 (3) 還原分錄底稿 (4) 原始單據取消確認 (5) 原始單據修改",
+    "options": {
+      "A": "(1)(2)(3)(4)(5)",
+      "B": "(2)(1)(3)(4)(5)",
+      "C": "(2)(1)(3)(5)",
+      "D": "(1)(2)(3)(5)"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 272,
+    "question": "資產盤點出現盤差狀況,可利用哪一個作業使帳面數量等於實際保管數量?",
+    "options": {
+      "A": "資產減損單",
+      "B": "資產重估單",
+      "C": "資產報廢單",
+      "D": "資產調整單"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 273,
+    "question": "下列關於資產移轉敘述何者有誤?",
+    "options": {
+      "A": "一張資產移轉單可做多筆資產之移轉",
+      "B": "可移轉保管部門",
+      "C": "可移轉保管人員",
+      "D": "系統不提供整批移轉的功能"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 274,
+    "question": "固定資產盤點流程下列何者正確? (1)盤點清單 (2)實地盤點 (3)盤點資料建立 (4)盤點資料產生",
+    "options": {
+      "A": "(4)(1)(2)(3)",
+      "B": "(4)(2)(3)(1)",
+      "C": "(2)(3)(4)(1)",
+      "D": "(1)(2)(3)(4)"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 275,
+    "question": "以下何種作業順序為採買『固定資產』之標準流程?",
+    "options": {
+      "A": "資產詢價->資產請購->資產採購 >資產進貨",
+      "B": "資產請購->資產採購->資產詢價->資產進貨",
+      "C": "資產請購->資產詢價->資產採購->資產進貨",
+      "D": "資產請購->資產採購->資產進貨->資產詢價"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 276,
+    "question": "『進項憑證產生作業』執行後,在『進銷項憑證維護作業』找不到進項資料,下列原 因何者為非?",
+    "options": {
+      "A": "應付憑單未確認",
+      "B": "應付憑單發票日期空白",
+      "C": "應付憑單已付款",
+      "D": "應付憑單單據性質未設定申報公司代號"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 277,
+    "question": "以下何者不是『進銷項憑證維護作業』可以看到的『課稅別』?",
+    "options": {
+      "A": "應稅內含",
+      "B": "應稅外加",
+      "C": "不計稅",
+      "D": "作廢"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 278,
+    "question": "若公司申報營業稅是採「按期申報」.請問可以透過鼎新ERP哪一個系統程式作設定?",
+    "options": {
+      "A": "稅籍資料建立作業",
+      "B": "每月發票建立作業",
+      "C": "多公司資料建立作業",
+      "D": "結帳單之單據性質設定"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 279,
+    "question": "何謂 ERP,下列何者正確?",
+    "options": {
+      "A": "Enterprise Resource Planning",
+      "B": "Enterprise Reengineering Program",
+      "C": "Engineering Recycle Project",
+      "D": "Extended Reengineering Process"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 280,
+    "question": "從 Workflow ERP 系統模組 V.S.職務角色而言,下列何組的對應是不適當的?",
+    "options": {
+      "A": "營業稅申報系統 V.S.財會人員",
+      "B": "產品結構管理系統 V.S.MIS 人員",
+      "C": "採購管理系統 V.S.採購人員",
+      "D": "品質管理系統 V.S.品管人員"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 281,
+    "question": "有關 Workflow ERP Client 的目錄中,何者是存放 Client 端的公用元件區?",
+    "options": {
+      "A": "C_data",
+      "B": "S_data",
+      "C": "C_dsbin",
+      "D": "S_dsbin"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 282,
+    "question": "下列哪種作業不是由派班中心處理或產生?",
+    "options": {
+      "A": "統計報表",
+      "B": "批次作業",
+      "C": "單據建立作業",
+      "D": "文字檔報表"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 283,
+    "question": "鼎新 Workflow ERP 系統產生的報表會存放在哪一區?",
+    "options": {
+      "A": "REPORT 區",
+      "B": "S_PKG",
+      "C": "S_MODI",
+      "D": "C_PKG"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 284,
+    "question": "有關 Workflow ERP 作業清單(主畫面左邊的選單)的描述以下何者為非?",
+    "options": {
+      "A": "作業清單有變更時,離開 WF-ERP 前必須要存檔",
+      "B": "作業程式名稱如果要修改(重新命名)一定要從程式資料建立作業中修改",
+      "C": "作業清單中各項目之排列順序可以直接用滑鼠拖曳調動",
+      "D": "點選作業的右鍵內容無法看到版本"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 285,
+    "question": "請問若欄位呈現藍綠色其意義為何(例如:採 購單建立作業中的採購單單號)?",
+    "options": {
+      "A": "新增狀態時,離開該欄位後就不可修改",
+      "B": "資料存檔後,如果有權限還是可以修改",
+      "C": "資料確認後,就不能修改",
+      "D": "資料存檔後,就不能修改"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 286,
+    "question": "若要查詢品名字串開頭是「電」字開頭的品 項,那麼條件式該如何選擇為佳?",
+    "options": {
+      "A": "=",
+      "B": "<>",
+      "C": "like",
+      "D": "<="
+    },
+    "answer": "C"
+  },
+  {
+    "id": 287,
+    "question": "若我們要查看作業的程式代號及版本時,應該使用何種功能鍵?",
+    "options": {
+      "A": "F5",
+      "B": "F2",
+      "C": "CTRL+ALT+V",
+      "D": "CTRL+V"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 288,
+    "question": "請問報表條件送出後,出現一串數字如:20030226000005,這代表什麼?",
+    "options": {
+      "A": "號碼是輸入者自己編號的",
+      "B": "開啟佇列工作控制台時,該報表的工作代號",
+      "C": "這張報表的單 別是 2003,單號是0000005",
+      "D": "號碼只是隨機,無任何意義"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 289,
+    "question": "調整報表欄位寬度時,系統會出現何種顏色的直線表示?",
+    "options": {
+      "A": "綠色",
+      "B": "藍色",
+      "C": "黃色",
+      "D": "紅色"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 290,
+    "question": "調整報表欄位的排列位置時,系統會出現何種顏色的直線表示?",
+    "options": {
+      "A": "紅色",
+      "B": "綠色",
+      "C": "藍色",
+      "D": "黃色"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 291,
+    "question": "報表轉出檔案的類型下列何者不是?",
+    "options": {
+      "A": "WORD檔",
+      "B": "EXCEL檔",
+      "C": "文字檔",
+      "D": "HTML格式檔"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 292,
+    "question": "報表資料中,若相同客戶代號、客戶名稱的資料有多筆,只想顯示出一次客戶代號名 稱,該如何處理報表格式?",
+    "options": {
+      "A": "運用「顯示明細資料」功能",
+      "B": "運用「處理縮排資料」功能",
+      "C": "設定欄位屬性為不顯示",
+      "D": "運用「對齊用十字線」功能"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 293,
+    "question": "如果不希望倉庫收料人員看到進貨單價,那麼我們該如何設定人員的權限?",
+    "options": {
+      "A": "查詢",
+      "B": "售價-唯讀",
+      "C": "售價-隱藏",
+      "D": "售價-一般"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 294,
+    "question": "下面有關登入 Workflow ERP 的相關敘述, 何者正確?",
+    "options": {
+      "A": "若沒有設定密碼,他人容易用該帳號直接登入,資料安全堪慮",
+      "B": "帳號和密碼皆空白時之登入,表示是最高權限",
+      "C": "帳號大小寫沒有差,例如:TOM和tom是一樣的",
+      "D": "密碼大小寫沒有差,例如:ABC和abc 是一樣的"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 295,
+    "question": "有關下列基本資料管理系統中的作業敘述,何者不正確?",
+    "options": {
+      "A": "庫別資料建立作業至少要建立一筆資料",
+      "B": "常用片語建立作業可建立自己常用的片語",
+      "C": "幣別匯率建立作業至少要建有台幣和美金兩種幣別。",
+      "D": "廠別資料建立作業至少要建立一筆資料"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 296,
+    "question": "下列有關基本資料系統「編碼原則設定作業」的敘述,何者不正確?",
+    "options": {
+      "A": "有品號編碼設定",
+      "B": "有產品結構編碼設定",
+      "C": "有客戶編碼設定",
+      "D": "有廠商編碼設定"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 297,
+    "question": "下列何者敘述錯誤?",
+    "options": {
+      "A": "鼎新 ERP 系統可以設定日期格式(西元\\民 國)",
+      "B": "鼎新 ERP 系統可以設定多種幣別資料",
+      "C": "鼎新 ERP 系統可以設計表單的簽核",
+      "D": "鼎新 ERP 系統只可以設計一個倉庫資料"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 298,
+    "question": "ERP的全名為何?",
+    "options": {
+      "A": "Extend Requirem entPlan",
+      "B": "Enterprise Requirem entPlan",
+      "C": "Enterprise Resource Planning",
+      "D": "Enterprise Resource Plan"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 299,
+    "question": "以下哪一個ERP模組與業務部門的職能關聯性較低?",
+    "options": {
+      "A": "訂單管理系統",
+      "B": "銷售分析系統",
+      "C": "批次需求計劃系統",
+      "D": "應收管理系統"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 300,
+    "question": "在WFERPGP系統中,資料欄位呈現 孔雀綠色,那麼其顏色意義為何 (如: )",
+    "options": {
+      "A": "新增狀態時,離開該欄位後就不可修改",
+      "B": "資料存檔後就不可修改",
+      "C": "資料確認後就不可修改",
+      "D": "資料存檔後若有權限仍可修改"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 301,
+    "question": "在WF ERP系統的程式及資料處理架 構中,APP Sever及DB Sever間是透過什麼程式 做連結?",
+    "options": {
+      "A": "工作佇列員",
+      "B": "DSCSYS",
+      "C": "Report Sever",
+      "D": "ADO"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 302,
+    "question": "下列哪種作業不會由派班中心處理?",
+    "options": {
+      "A": "報表",
+      "B": "批次作業",
+      "C": "單據建立作業",
+      "D": "文字檔報表"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 303,
+    "question": "在WF ERP系統中,若要新增一張採購單據,可按下哪一功能鍵視同為新增?",
+    "options": {
+      "A": "F1",
+      "B": "F2",
+      "C": "F3",
+      "D": "F5"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 304,
+    "question": "『鍵值(KEY)』的欄位在WF ERP系統的作業下列說明何者為非?",
+    "options": {
+      "A": "孔雀綠色",
+      "B": "存檔後仍可修改",
+      "C": "存檔時不可空白",
+      "D": "此欄位不可以重複"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 305,
+    "question": "若要查詢某一個「備註」性質欄位, 為「南」字開頭,最適合選擇的「條件式」為 何?",
+    "options": {
+      "A": "=",
+      "B": ">=",
+      "C": "%Like",
+      "D": "Like%"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 306,
+    "question": "在WF ERP系統裡,若要查詢該作業之線上說明文件,可使用下列哪一個功能鍵?",
+    "options": {
+      "A": "F1",
+      "B": "F2",
+      "C": "F5",
+      "D": "F12"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 307,
+    "question": "在WF ERP系統裡,設定查詢的條件式 「like」用法,以下何者有誤?",
+    "options": {
+      "A": "「%like」為查詢「開頭是」",
+      "B": "「%like%」為查詢「包含」",
+      "C": "「like%」為查詢「開頭是」",
+      "D": "「%like」為查詢「結尾是」"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 308,
+    "question": "系統預設之最高使用權限者帳號是?",
+    "options": {
+      "A": "DSC",
+      "B": "dsc",
+      "C": "DS",
+      "D": "ds"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 309,
+    "question": "調整報表寬度時,WF ERP系統會出現何種顏色的直線表示?",
+    "options": {
+      "A": "紅色",
+      "B": "藍色",
+      "C": "綠色",
+      "D": "黃色"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 310,
+    "question": "WFERP系統報表轉出的檔案類型,下列何者不是?",
+    "options": {
+      "A": "EXCEL檔",
+      "B": "文字檔",
+      "C": "PowerPoint檔",
+      "D": "HTML格式"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 311,
+    "question": "以下何者不是工作佇列的處理狀態?",
+    "options": {
+      "A": "等待中",
+      "B": "產生中",
+      "C": "已完成",
+      "D": "鎖定中"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 312,
+    "question": "當報表工作佇列的處理狀態是何種狀況才可以開啟報表?",
+    "options": {
+      "A": "處理中",
+      "B": "已完成",
+      "C": "等待中",
+      "D": "有問題"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 313,
+    "question": "有關WF ERP系統使用者,登錄密碼管理的描述何者為非?",
+    "options": {
+      "A": "密碼長度可以統一規定",
+      "B": "超級使用者也看不到使用者的密碼",
+      "C": "密碼輸入時進行轉換看不到的明碼",
+      "D": "資訊中心人員可以查詢得到密碼"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 314,
+    "question": "使用者在使用手冊裡,查看得到系統有某建立作業、畫面說明,但是在系統中卻無法 執行該作業,原因可能是?",
+    "options": {
+      "A": "按F1鍵把執行的權限加上去就可以了",
+      "B": "未給予執行權限,所以無法執行",
+      "C": "按F1鍵把隱藏的作業叫出來就可以",
+      "D": "使用者的功能鍵安裝的不完全"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 315,
+    "question": "有關WFERP系統的「廠別資料建 立」,以下描述何者有誤 ?",
+    "options": {
+      "A": "至少要建立一筆廠別資料",
+      "B": "ERP日常異動單據都要指定進出貨、生產廠別代號",
+      "C": "若無工廠的企業可以不用建立廠別資料",
+      "D": "後續可依廠別資料作為報表統計之篩選條"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 316,
+    "question": "憑證、報表常用的備註事項及簽核程序,可以先在那一支作業建立後以便後續使用",
+    "options": {
+      "A": "程式註記/簽核建立",
+      "B": "註記/簽核資料建立作業",
+      "C": "常用片語建立作業",
+      "D": "行事曆建立作業"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 317,
+    "question": "關於WF ERP系統之基本資料「付款條件建立作業」,以下描述何者為是?",
+    "options": {
+      "A": "採購/託工類主要用於銷/退貨及結帳單據",
+      "B": "銷售類主要用於進退貨單及應付憑單",
+      "C": "在異動單據上指定付款條件,有助於企業資金預估管理",
+      "D": "付款條件只能建立一次"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 318,
+    "question": "鼎新發展顧問輔導的標準 ERP 導入五大階段, 1 教育訓練階段 2 專案計畫階段 3 正 式上線階段 4 作業流程擬定階段 5 效益評估及結案階段,以下排序何者正確?",
+    "options": {
+      "A": "21345",
+      "B": "21435",
+      "C": "12435",
+      "D": "12345"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 319,
+    "question": "有關 MRP 邏輯中,何者公式正確? 淨計畫量=",
+    "options": {
+      "A": "每日需求量小計-每日供給量小計-當日可用庫存量",
+      "B": "每日供給量小計-每日需求量小計-當日可用庫存量",
+      "C": "每日需求量小計-每日供給量小計-當日總庫存量",
+      "D": "每日供給量小計-每日需求量小計-當日總庫存量"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 320,
+    "question": "企業推動 ERP 時,MIS資訊單位階層若只屬於課層級(低階主管層級),我們會擔心面 臨哪些問題?",
+    "options": {
+      "A": "當 ERP 推動發生資源瓶頸時,擔心人微言輕,建言不容易被採納",
+      "B": "當發生作業或流程調整時協調的執行權力不足",
+      "C": "當 ERP 推動發生延遲或異常時,需要組織動員支援的時效不佳",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 321,
+    "question": "報表開啟後,會出現的狀況何者為非?",
+    "options": {
+      "A": "調整報表欄寬大小時會出現紅色線條",
+      "B": "要移動報表欄位時會出現藍色標線",
+      "C": "要移動報表欄位時,會出現一隻手的符號,方便使用者移動欄位",
+      "D": "報表開啟後,若無「小計」欄位可自行設計需要「小計」的方式及欄位位置"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 322,
+    "question": "有關企業評量 ERP 常用的 10 大指標,何者為非?",
+    "options": {
+      "A": "損益結算時效",
+      "B": "企業籌資目標達成率",
+      "C": "採購成本",
+      "D": "應收帳款天數"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 323,
+    "question": "MRP物料需求計畫中所談的供需平衡的用料計畫,下列何者不屬於供給來源?",
+    "options": {
+      "A": "採購單",
+      "B": "客戶訂單",
+      "C": "製令的生產品",
+      "D": "可用庫存量"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 324,
+    "question": "ERP II 中談到以 ERP 系統為核心再發展延伸的幾個整合資訊系統,以下何者為非?",
+    "options": {
+      "A": "Customer Relationship Management",
+      "B": "Supply Chain Management",
+      "C": "e-learning",
+      "D": "Collaborative Commerce (協同商務)"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 325,
+    "question": "『鍵值(KEY)』的欄位在 WF ERP 系統的作業畫面是哪種顏色 ?",
+    "options": {
+      "A": "白色",
+      "B": "黃色",
+      "C": "紅色",
+      "D": "孔雀綠色"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 326,
+    "question": "以下何者非 ERP 系統導入效益?",
+    "options": {
+      "A": "企業流程 BPR 的最佳時機",
+      "B": "可利用 ERP 來執行內部控制",
+      "C": "利用 IT 技術快速處理大量資料",
+      "D": "降低離職率"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 327,
+    "question": "WF ERP系統報表格式可以有類似EXCEL的凍結窗格功能,下列何者正確?",
+    "options": {
+      "A": "處理縮排",
+      "B": "對齊用十字線",
+      "C": "折行",
+      "D": "固定欄位"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 328,
+    "question": "若 ERP 推動時,假設專案組織分為企業主/E 化規劃小組/E 化執行小組,而有關 E 化規劃小組權責的描述,以下何者為非?",
+    "options": {
+      "A": "負責 ERP 個案修改的需求確認",
+      "B": "負責企業 ERP 導入成敗之責",
+      "C": "一定要親身參與及登錄 ERP 所有基本資料",
+      "D": "負責執行及評估 ERP 導入成效"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 329,
+    "question": "ERP 架構中,建置 QOS 設備,其功能目的為何?",
+    "options": {
+      "A": "是一種儲存設備",
+      "B": "頻寬管理器,確保 ERP 處理的速度維持",
+      "C": "是一種 Load Balance 設備",
+      "D": "是一種防毒軟體"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 330,
+    "question": "有關資訊單位災難復原計畫的描述,何者為非?",
+    "options": {
+      "A": "不管資訊應用系統多寡與大小,企業均應就資訊系統的運作建置災難復原計畫",
+      "B": "資訊系統的災難復原計畫是一種預防措施",
+      "C": "災難復原計畫應該定期,最長不超過一年測試一次",
+      "D": "上市上櫃公司才要訂定災難復原計畫的制度辦法"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 331,
+    "question": "以下何者不是 WF ERP 的資訊控制模式【參數控制】之作業目的?",
+    "options": {
+      "A": "保留系統彈性",
+      "B": "滿足不同管理特性之企業",
+      "C": "滿足不同管理規模之企業",
+      "D": "企業資訊預算大小之考量"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 332,
+    "question": "鼎新顧問輔導之 ERP 導入「教育訓練」階段,下列說明何者有誤?",
+    "options": {
+      "A": "為避免影響企業運作,ERP 培訓一般員工即可,無須涉及主管職",
+      "B": "基礎資料重點規劃之一是電腦化資料的編碼原則",
+      "C": "基礎資料重點規劃之一是成品 BOM 分階原則",
+      "D": "學習者未經系統教育訓練將影響 ERP 上線成效"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 333,
+    "question": "衡量企業 e 化程度的指標,下列何者為非?",
+    "options": {
+      "A": "流程 e 化的比率",
+      "B": "表單 e 化的比率",
+      "C": "網路頻寬",
+      "D": "上下游廠商的 e 化整合程度"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 334,
+    "question": "H為一個採購件,4/01良品倉庫有100PCS,不良品倉庫有50PCS,4/03當天須領料 30PCS,4/05日當天有訂單零組件須出貨120PCS,4/08日當天須領料100PCS,已 經發出去的採購單在4/10預計入庫200PCS。 (註:領料及出貨必須運用前一天的存貨量),以下日期存貨數量何者錯誤?",
+    "options": {
+      "A": "4/02存貨為70 PCS",
+      "B": "4/03存貨為-50PCS",
+      "C": "4/07存貨為-120PCS",
+      "D": "4/10存貨為50PCS"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 335,
+    "question": "有關 ERP 效益之評量計算,何者描述為非?",
+    "options": {
+      "A": "企業應該設定評量週期,追蹤 ERP 效益是否有如期達成",
+      "B": "ERP 效益在上線當月就應該全面達成,未達成是 E 化小組的責任",
+      "C": "有些評量指標在上線前幾個月會退步,主要是人員熟悉度及適應性的問題",
+      "D": "ERP 評量的指標實際值最好能透過資訊系統產生最精確"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 336,
+    "question": "有關 WF ERP 報表處理的描述何者為是? (1)報表產生要派班中心 Dispatcher 啟動才能執行 (2)派班中心可以不與 DB Sever 同一個網域 (3)報表產生速度很慢可以追加 APP Sever 是最佳的方案 (4)報表產生結果存在 ConductorS.ini 中",
+    "options": {
+      "A": "(1)(2)",
+      "B": "(1)",
+      "C": "(1)(2)(3)",
+      "D": "(3)(4)"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 337,
+    "question": "MRP 計算後可能產生兩種計畫,請問會是哪兩種?",
+    "options": {
+      "A": "採購計畫與存貨計畫",
+      "B": "生產計劃與採購計畫",
+      "C": "生產計劃與行銷計畫",
+      "D": "物料計畫與生產計劃"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 338,
+    "question": "若 ERP 推動時,假設專案組織分為企業主/E 化規劃小組/E 化執行小組,而有關企業 主權責的描述,以下何者為非",
+    "options": {
+      "A": "宣誓及完全支持 E 化的態度是企業 ERP 導入的成功關鍵",
+      "B": "應定期召開會議,檢討專案進度,隨時修正 E 化進度或方向",
+      "C": "一定要親身參與所有的訓練課程",
+      "D": "決策阻礙 ERP 導入進度,相關的阻礙排除及資源的調度"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 339,
+    "question": "以下有關建立作業時「刪除」功能的說明,何者有誤?",
+    "options": {
+      "A": "可分為「整張單據刪除」及「單身單筆刪除」兩種方式",
+      "B": "若要執行「整張單據刪除」的功能,該張單據狀態就不得是「已確認」或「已作 廢」",
+      "C": "若要執行「單身單筆資料刪除」,可先點選要刪除的資料,再按下 ALT+DEL 的按 鍵",
+      "D": "單據必須是在「修改」狀態下,才可執行「單身單筆資料刪除」功能"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 340,
+    "question": "MRP物料需求計畫中所談的供需平衡的用料計畫,下列何者是屬於需求來源?",
+    "options": {
+      "A": "請購量",
+      "B": "客戶訂單",
+      "C": "可用庫存量",
+      "D": "製令的生產品"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 341,
+    "question": "有關 WF ERP 安裝後的系統備份管理,以下描述何者有誤?",
+    "options": {
+      "A": "備份作業時,最好是自動備份及手動備份交互使用比較安全",
+      "B": "備份媒體應考慮異地備份機制",
+      "C": "備份作業應於每日定時有效執行",
+      "D": "不管有沒有個案修改,備份作業只須備份DATA 區"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 342,
+    "question": "有關報表格式修改,下列何者正確?",
+    "options": {
+      "A": "可調整欄位寬度",
+      "B": "可調整欄位位置",
+      "C": "可隱藏/顯示欄位",
+      "D": "以上皆是"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 343,
+    "question": "可藉 ERP 系統導入,來衡量財務效能的可用指標,以下何者為非?",
+    "options": {
+      "A": "應收帳款結帳時效",
+      "B": "間接人員生產力或產值",
+      "C": "資金或現金週轉率",
+      "D": "產品成本的可信度"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 344,
+    "question": "以下何者非 ERP 系統導入效益?",
+    "options": {
+      "A": "透過資訊整合,提供各種查核報表",
+      "B": "有效提升資產報酬率",
+      "C": "利用 IT 技術快速處理大量資料",
+      "D": "可利用 ERP 來執行內部控制"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 345,
+    "question": "ERP 系統環境外點的解決方案 Microsoft Terminal Services 的描述,下列何者為非?",
+    "options": {
+      "A": "使用 RAD 通訊協定",
+      "B": "Client 端可以不用安裝 ERP 的程式",
+      "C": "Client 端利用 Browser 連接 Terminal Services",
+      "D": "Microsoft Terminal Services 為付費應用工具軟體"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 346,
+    "question": "以下哪一個 ERP 模組與財務會計部門的職能關聯性較低?",
+    "options": {
+      "A": "會計總帳管理系統",
+      "B": "營業稅申報系統",
+      "C": "人事薪資管理系統",
+      "D": "自動分錄系統"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 347,
+    "question": "以下何者不是 ERP 專案計畫內容應該具備的項目?",
+    "options": {
+      "A": "智慧財產權切結書",
+      "B": "專案時程",
+      "C": "專案組織",
+      "D": "專案產出"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 348,
+    "question": "MRP II 的全名為何?",
+    "options": {
+      "A": "Extend MRP Plan",
+      "B": "Material Resource Planning",
+      "C": "Manufacturing Reqirement Planning",
+      "D": "Manufacturing Resource Planning"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 349,
+    "question": "在查詢的條件關係中「AND」及「OR」的描述,下列何者正確?",
+    "options": {
+      "A": "AND(且),OR(或)",
+      "B": "AND(或),OR(且)",
+      "C": "AND(等於),OR(Like)",
+      "D": "AND(Like),OR(等於)"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 350,
+    "question": "有關 WF ERP 系統之報表格式設定,以下說明何者為是?",
+    "options": {
+      "A": "「處理縮排」表示調整報表行距",
+      "B": "「顯示明細」表示報表縮小比例",
+      "C": "「主標題」通常顯示的是報表名稱",
+      "D": "「顯示右邊界」用來提示印表機列印的範圍界線"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 351,
+    "question": "設計 ERP 系統時必須了解企業的營運需求,而營運需求應包含哪些 1企業價值鏈與管理重點、2規章制度、3作業流程、4股東權益",
+    "options": {
+      "A": "123",
+      "B": "234",
+      "C": "124",
+      "D": "134"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 352,
+    "question": "鼎新發展出改良型之 MRP 系統,稱之為 LRP 系統,而以下描述何者為非?",
+    "options": {
+      "A": "LRP 是將一張或若干張的訂單或工單之產品,作為計劃依據",
+      "B": "有了 LRP 計畫就不再需要運用 MRP 來規劃存貨",
+      "C": "LRP 可完整記錄所有需求計畫量組成內容",
+      "D": "LRP 提供淨需求或毛需求選項的計劃算法"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 353,
+    "question": "請問報表開啟後,下列描述何者有誤?",
+    "options": {
+      "A": "可在佇列工作控制台內,查詢到輸入的篩選條件",
+      "B": "報表內容可以轉成EXCEL檔",
+      "C": "報表內容可轉成PDF檔",
+      "D": "可以調整報表的欄位寬度"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 354,
+    "question": "以下哪一個 E 化專案組織是由 ERP 系統廠商與各部門共同組成?",
+    "options": {
+      "A": "E 化策略委員會",
+      "B": "E 化規劃小組",
+      "C": "E 化執行小組",
+      "D": "以上皆非"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 355,
+    "question": "WF ERP 系統報表格式儲存種類是如何排序?",
+    "options": {
+      "A": "公司代號+使用者",
+      "B": "公司代號+格式代號",
+      "C": "使用者+格式代號",
+      "D": "格式代號"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 356,
+    "question": "以下哪一個 ERP 模組與倉庫部門的職能關聯性較低?",
+    "options": {
+      "A": "庫存管理系統",
+      "B": "製令管理系統",
+      "C": "採購管理系統",
+      "D": "產品結構系統"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 357,
+    "question": "以下何者不是內部控制-九大交易循環之一?",
+    "options": {
+      "A": "薪工循環",
+      "B": "採購付款循環",
+      "C": "研發循環",
+      "D": "資產處分循環"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 358,
+    "question": "以下何者不是 ERP 系統被切割成不同模組的原因?",
+    "options": {
+      "A": "考量企業預算問題",
+      "B": "考量企業部門需求",
+      "C": "考量企業的產業特性",
+      "D": "考量企業同產品線問題"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 359,
+    "question": "以下有關低階碼的描述何者為非?",
+    "options": {
+      "A": "在「品號基本資料作業」中的欄位",
+      "B": "可用來作為判斷哪些料件的成本應先計算",
+      "C": "在 BOM 結構中其階次位置在最上面,階次編號為第零階",
+      "D": "關係著 MRP 物料需求展算及成本的計算邏輯"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 360,
+    "question": "對於 ERP II 的描述內容,以下何者為非?",
+    "options": {
+      "A": "將 ERP 的訂單管理延伸到 CRM 客戶關係管理系統",
+      "B": "將 ERP 的採購管理延伸到 SCM 供應鏈管理系統或協同商務",
+      "C": "必須以 ERP 系統廠商所提供相關軟體才能無縫及時性地整合",
+      "D": "為以 ERP 資訊系統為核心再發展延伸的整合性資訊系統"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 361,
+    "question": "淨計畫量公式何者正確?",
+    "options": {
+      "A": "每日需求量小計-每日供給量小計+當日可用庫存",
+      "B": "每日需求量小計-每日供給量小計-當日可用庫存",
+      "C": "每日供給量小計-每日需求量小計-當日可用庫存",
+      "D": "每日供給量小計-每日需求量小計+當日可用庫存"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 362,
+    "question": "MRP物料需求計畫中所談的是供需平衡的用料計畫,下列何者是屬於需求的來源?",
+    "options": {
+      "A": "請購量",
+      "B": "客戶訂單",
+      "C": "可用庫存量",
+      "D": "製令的生產品"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 363,
+    "question": "MRP的全名為何?",
+    "options": {
+      "A": "Material Requirement Planning",
+      "B": "Material Resource Planning",
+      "C": "Manufacturing Requirement Planning",
+      "D": "Manufacturing Resource Planning"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 364,
+    "question": "有關 MRP 計算產生的需求計畫,以下描述何者為非?",
+    "options": {
+      "A": "需求計畫的時間推算是以製造或採購的前置時間為依據",
+      "B": "需求計畫的假設前題是製造產能無限",
+      "C": "需求計畫產生後,可以清楚的知道每一需求計畫來源訂單為何",
+      "D": "需求計畫指的是需求時間區段內的淨需求"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 365,
+    "question": "一般企業 MRP 系統無法上線的主要原因,下列何者為非?",
+    "options": {
+      "A": "生產排程不穩定",
+      "B": "BOM 準確度不佳",
+      "C": "訂單交期變化大",
+      "D": "採領料作業而非發料作業"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 366,
+    "question": "關於美國產業管理學會對 ERP 的定義,以下何者為非?",
+    "options": {
+      "A": "關連式資料庫",
+      "B": "第四代語言",
+      "C": "開放性系統平台",
+      "D": "主從架構"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 367,
+    "question": "當 ERPII概念被提出時,同時提出三項的特徵,請問是哪三項? A.擴大 ERP 時代對資源定義的範圍 B.企業必須加速 BPR 變革管理 C.必須擴大運用網路及 IT 的技術 D.企業必須建置資訊安全管理",
+    "options": {
+      "A": "ABC",
+      "B": "ABD",
+      "C": "BCD",
+      "D": "ACD"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 368,
+    "question": "ERPII的理念是由誰提出",
+    "options": {
+      "A": "IBM",
+      "B": "微軟",
+      "C": "Gartner Group Inc",
+      "D": "鼎新電腦"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 369,
+    "question": "以下關於 ERP 和 ERPII的描述,何者為非?",
+    "options": {
+      "A": "ERP的基礎架構是 MRPII",
+      "B": "ERPII的範疇包含 SCM 供應鏈管理",
+      "C": "ERP的發展穩定後將朝 ERPII邁進",
+      "D": "ERPII的範疇不包含 CRM 模組"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 370,
+    "question": "以下針對 ERP 導入與 BPR(企業流程再造)的關連描述何者正確?",
+    "options": {
+      "A": "ERP 導入跟企業流程有密切關係,所以有機會配合進行 BPR",
+      "B": "ERP 導入和 BRP 是獨立事件,企業應該先進行BPR 再進行 ERP 導入",
+      "C": "ERP 導入上線後,再來進行 BPR",
+      "D": "BPR 跟 ERP 導入沒有關連"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 371,
+    "question": "以下何者非 ERP 系統導入的效益",
+    "options": {
+      "A": "企業流程 BPR 的最佳時機",
+      "B": "透過資訊整合,提供各種查核報表",
+      "C": "利用 IT 技術快速處理大量資料",
+      "D": "有效提升資產報酬率"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 372,
+    "question": "可藉 ERP 系統導入,來衡量資材管理效能的可用指標,以下何者為非?",
+    "options": {
+      "A": "設備開工率",
+      "B": "存貨週轉率",
+      "C": "存貨平均維持天數",
+      "D": "緊急採購頻率"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 373,
+    "question": "以下哪一個 ERP 模組與採購部門的職能關連性低?",
+    "options": {
+      "A": "庫存管理系統",
+      "B": "進口系統",
+      "C": "採購系統",
+      "D": "出口系統"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 374,
+    "question": "以下哪一個 ERP 模組與財務會計部門的職能關連性較低?",
+    "options": {
+      "A": "會計總帳系統",
+      "B": "營業稅媒體申報系統",
+      "C": "人事薪資系統",
+      "D": "自動分錄系統"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 375,
+    "question": "WF-ERP 產品模組中哪一個模組應該屬第二階段上線較佳?",
+    "options": {
+      "A": "成本計算管理系統",
+      "B": "製令/託外管理系統",
+      "C": "固定資產管理系統",
+      "D": "訂單管理系統"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 376,
+    "question": "以下哪一模組非屬高階管理資訊系統",
+    "options": {
+      "A": "存貨決策支援系統",
+      "B": "生產決策支援系統",
+      "C": "薪工決策支援系統",
+      "D": "會計總帳管理系統"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 377,
+    "question": "ERP 推動時,MIS 資訊部門的組織定位應屬於哪一個層級比較適當?",
+    "options": {
+      "A": "ERP 推動跟公司管理有關,所以應該定位在管理部門下比較適當",
+      "B": "ERP 導入最後才是匯入財務資料中,所以隸 屬財會部門比較適當",
+      "C": "ERP 的推動涵蓋公司的變革,由總經理或經營管理者管轄比較適當",
+      "D": "只要 MIS 單位主管職 稱夠高,其組織定位不用擔心"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 378,
+    "question": "若 ERP 推動時,假設專案組織分為-企業主/e 化規劃小組/e 化執行小組,有關企業 主的權責描述何者為非?",
+    "options": {
+      "A": "宣誓及完全支持 e 化的態度是企業 ERP 導入的成功關鍵",
+      "B": "應定期召開會議,檢討專案進度,隨時修訂 e 化的進度或方向",
+      "C": "一定要親身參與所有的訓練課程",
+      "D": "決策阻礙影響 ERP 導入進度,相關的阻礙排除及資源的調度"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 379,
+    "question": "若 ERP 推動時,假設專案組織分為-企業主/e 化規劃小組/e 化執行小組,有關 e 化 執行小組的權責描述何者為非?",
+    "options": {
+      "A": "負責 ERP 個案修改的需求提出與驗收",
+      "B": "全程參加與職能相關的系統課程訓練",
+      "C": "負責 ERP 系統相關職能的基本資料收集及登錄",
+      "D": "當 ERP 系統流程與現行作業流程發生差異時,負責 BPR"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 380,
+    "question": "WF-ERP 若有個案修改,個案程式放在 APP SEVER 端的哪一個目錄",
+    "options": {
+      "A": "S_modi",
+      "B": "S_pkg",
+      "C": "S_data",
+      "D": "S_log"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 381,
+    "question": "WF-ERP 出貨時有一個超級使用者帳號及密碼,請問以下何者為是?",
+    "options": {
+      "A": "使用者:(空白) 密碼:(空白)",
+      "B": "使用者:DS 密碼:(空白)",
+      "C": "使用者:WFERP 密碼:DS",
+      "D": "使用者:WFERP 密碼:(空白)"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 382,
+    "question": "有關 WF-ERP 安裝後的系統備份管理,以下描述何者為非?",
+    "options": {
+      "A": "資料備份在 WF-ERP 上線完成後才需開始備份",
+      "B": "資料備份應在建置基本資料及參數時,或有資料登錄就該備份",
+      "C": "備份的媒體應該要準備數套輪流使用",
+      "D": "資料備份時,應有檢視備份是否成功的機制"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 383,
+    "question": "資料執行備份回存後,哪一項測試是不必要的?",
+    "options": {
+      "A": "產生一張報表測試是否能列印",
+      "B": "檢查使用者權限是否正確無誤",
+      "C": "檢查建檔及異動作業,是否都能執行無誤",
+      "D": "所有相關系統重新執行一次過帳"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 384,
+    "question": "有關資料備份的儲存媒體管理,以下描述何者為非?",
+    "options": {
+      "A": "儲存媒體是有使用壽命的,應有定期更換的機制",
+      "B": "儲存媒體應標示清楚備份內容及日期,並妥善保管",
+      "C": "儲存媒體的非正常借出,應視同公司機密文件控管",
+      "D": "備份有專業性一定要由 MIS 來執行"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 385,
+    "question": "資料備份後,為安全起見應該進行備份完整性檢查,以下描述何者為非?",
+    "options": {
+      "A": "檢查備份的目錄是否完整",
+      "B": "檢查備份的檔案數及大小是否一致",
+      "C": "檢查備份的資料庫是否完整",
+      "D": "備份檢查只有在更新備份媒體時才須要做"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 386,
+    "question": "以下何者為 DataBase 的儲存架構?",
+    "options": {
+      "A": "QOS",
+      "B": "SAN",
+      "C": "DAS",
+      "D": "Load Balance"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 387,
+    "question": "鼎新 ERP 系統屬於三層架構,所謂三層,以下何者為非?",
+    "options": {
+      "A": "前端使用者-Client 端",
+      "B": "中間應用伺服器",
+      "C": "資料庫",
+      "D": "網路連接器"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 388,
+    "question": "有關 ERP 系統的架構描述,以下描述何者為非?",
+    "options": {
+      "A": "若企業經費有限可以將 DataBase Server 及 APP Server 放在同一台主機",
+      "B": "Client 端是資料輸入操作的界面",
+      "C": "所謂兩層架構是指:client 端有安裝ERP的Server應用程式",
+      "D": "所謂的三層架構是指:client 端有安裝ERP的 Server 應用程式"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 389,
+    "question": "在 WF-ERP 系統的程式及資料處理架構中,APP Server 及 DB Server 間是透過什麼 程式做連結?",
+    "options": {
+      "A": "MIDAS 或 Socket",
+      "B": "DSCSYS",
+      "C": "Report Server",
+      "D": "BDE"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 390,
+    "question": "有關 ERP 系統環境架構的描述,以下何者為非?",
+    "options": {
+      "A": "若有 10 台 Client 端,要連結主機要透過網路 HUB 處理",
+      "B": "UPS 不斷電設備要建置在 HUB 上",
+      "C": "若為節省成本,備份的設備可直接裝在 DB Server 上",
+      "D": "APPServer 端指的是存放 ERP 運算程式的主機"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 391,
+    "question": "有關 ERP 系統環境架構中,UPS 不斷電系統的建置,以下描述何者為非?",
+    "options": {
+      "A": "DB Server 應建置 UPS 設備",
+      "B": "APP Server 應建置 UPS 設備",
+      "C": "UPS 的規格跟使用人數無關",
+      "D": "UPS 在斷電時才由人工開啟即可"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 392,
+    "question": "ERP 系統環境的解決方案 Microsoft Terminal Services 是針對工作端狀況有哪一情 形的解決方案?",
+    "options": {
+      "A": "因為用 Terminal Services 可以不用安裝 ERP 的程式在 Client 端上,可以節省 MIS 維護系統的時間",
+      "B": "沒有防毒軟體",
+      "C": "沒建置防火牆的系統",
+      "D": "APP Server 與 DB server 放在同一台主機者"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 393,
+    "question": "有關 ERP 報表的處理描述何者為非?",
+    "options": {
+      "A": "報表處理屬於非同步處理",
+      "B": "報表產生及顯示只能在同一台電腦中",
+      "C": "報表的顯示查詢必須是原始產生報表的使用者",
+      "D": "報表顯示查詢時可以看到報表的篩選條件"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 394,
+    "question": "有關 ERP 報表的處理描述,以下何者為非?",
+    "options": {
+      "A": "報表由 Client 端將條件訊息送出到 APP Server 端由 BDE 工作回應一個工作代號",
+      "B": "Dispatcher Server 會掃描是否有待處理的報表,有者則執行之",
+      "C": "報表產生完成後會將結果存在 Report Server 中",
+      "D": "使用者必須啟動「佇列工作管理員」才能看到報表結果"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 395,
+    "question": "在企業資訊管理中有關災難復原計畫的內涵,以下何者為非?",
+    "options": {
+      "A": "完整的備援工作站",
+      "B": "備份的媒體,應考慮異地備份機制",
+      "C": "資料庫回存的測試程序",
+      "D": "測試環境及系統連結"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 396,
+    "question": "有關 WF-ERP 非同步處理架構以下描述何者為是? A.批次作業如有產生 LOG 檔需要透過 dscsys.ini 來設定產生的目? B.報表產生結果存放在報表格式資料庫中 C.如有指定產生 Html 報表,則需依據 dscsys.ini 來設定產生的目? D.報表的工作代號是由 dispatcher 來回應的",
+    "options": {
+      "A": "ABC",
+      "B": "BC",
+      "C": "BCD",
+      "D": "B"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 397,
+    "question": "有關 WF-ERP 報表產生後若要指定產生 Html 報表,可指定目錄,必須透過什麼來設 定?",
+    "options": {
+      "A": "ConductorS.ini",
+      "B": "dscsys.ini",
+      "C": "dispatcher",
+      "D": "socket"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 398,
+    "question": "使用者在進行報表資料產生時,以下描述何者為非?",
+    "options": {
+      "A": "報表條件選取執行後,系統會給一個工作序號,要憑工作序號開啟報表",
+      "B": "報表如果在工作佇列找不到產生完成的報表,須到 Leadertemp 中去找",
+      "C": "報表的開啟必須為當時產生者,若不是產生者也不是超級使用者則看不到",
+      "D": "歷史 的報表若不再使用是可以清除的"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 399,
+    "question": "有關 WF-ERP 硬體環境建置的規劃,以下描述何者為非?",
+    "options": {
+      "A": "一個軟體授權只能有一個 DB-server",
+      "B": "可以有多台 APP Server",
+      "C": "只能有一台 Dispatcher Server",
+      "D": "可以有很多台 Terminal Server"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 400,
+    "question": "有關 WF-ERP 硬體環境建置的規劃,以下描述何者為非?",
+    "options": {
+      "A": "最好有一台 DB Server,一台 APP Server, 這樣效能會比較好",
+      "B": "至少一台 APP Server+DB Server,以及一台 dispatcher會比較好",
+      "C": "系統的人數限制是管制同時進入ERP系統的人數,不論其是否在操作",
+      "D": "Report Server 必須設在 DB server 上"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 401,
+    "question": "憑證自行設計完成後,如何分享予他人使用?",
+    "options": {
+      "A": "無法分享,只能自己設自己的",
+      "B": "要到 ConductorC.ini 中設定",
+      "C": "要到 ConductorS.ini 中設定",
+      "D": "要到 DSUPDATE.ini 中設定"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 402,
+    "question": "使用者要如何查詢每支作業的程式代號?",
+    "options": {
+      "A": "一般使用者不能查到,只能透過MIS人員",
+      "B": "進入該支作業畫面後,按 CTRL+ALT+V",
+      "C": "進入該支作業畫面後,按右鍵",
+      "D": "進入該支作業畫面後,連續按左鍵二下"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 403,
+    "question": "當單身中的某一筆資料輸入錯誤時,要如何刪除?",
+    "options": {
+      "A": "將游標點到該筆按CTRL+DEL即可刪除",
+      "B": "將游標點到該筆按DEL即可刪除",
+      "C": "將游標點到該筆按 ALT+DEL即可刪除",
+      "D": "將游標點到該筆按CTRL+ALT+DEL即可刪除"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 404,
+    "question": "請問在 WF-ERP 系統欄位要開窗應該按下列何種功能鍵?",
+    "options": {
+      "A": "F1",
+      "B": "F2",
+      "C": "F5",
+      "D": "F8"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 405,
+    "question": "新增一筆資料輸入完成後,要記得存檔才能離開,請問以下何種按鍵是存檔?",
+    "options": {
+      "A": "紅色 的打叉圖示",
+      "B": "綠色的打勾圖示",
+      "C": "F1",
+      "D": "F2"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 406,
+    "question": "請問在輸入資料後,若發現資料輸錯了要離開放棄,請問要按何種按鍵?",
+    "options": {
+      "A": "紅色的打叉圖示",
+      "B": "綠色的打勾圖示",
+      "C": "F1",
+      "D": "F2"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 407,
+    "question": "請問在本軟體輸入採購單時,可按哪一個功能鍵視同新增功能?",
+    "options": {
+      "A": "F1",
+      "B": "F2",
+      "C": "F3",
+      "D": "F5"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 408,
+    "question": "請問若欄位呈現黃色其意義為何(例如:採購單建立作業中的供應廠商代碼)?",
+    "options": {
+      "A": "新增狀態時,離開該欄位後就不可修改",
+      "B": "資料存檔後,就不能修改",
+      "C": "資料確認後,就不能修改",
+      "D": "不可以空白,一定要輸入"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 409,
+    "question": "請問若欄位呈現白色其意義為何(例如:採購單建立作業中的採購人員)?",
+    "options": {
+      "A": "可以輸入,也可以空白",
+      "B": "不可空白",
+      "C": "數值欄位可輸入中文字",
+      "D": "數值欄位可輸入英文字"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 410,
+    "question": "假設開窗查詢出來的資料有好多頁,請問要查最後一筆資料時,要按何種按鍵?",
+    "options": {
+      "A": "CTRL+END",
+      "B": "CTRL+↓",
+      "C": "Pg Dn",
+      "D": "Pg Up"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 411,
+    "question": "請問要將開窗的查詢資料帶入目的欄位,請問要按何種按鍵?",
+    "options": {
+      "A": "ENTER",
+      "B": "SPACE",
+      "C": "TAB",
+      "D": "F5"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 412,
+    "question": "WF-ERP 提供每支程式的版號,請問要按何種按鍵?",
+    "options": {
+      "A": "F1",
+      "B": "CTRL+V",
+      "C": "CTRL+ALT+V",
+      "D": "F5"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 413,
+    "question": "以下關於建立作業裡「刪除」功能的說明,何者有誤?",
+    "options": {
+      "A": "可分為「整張單據刪除」及「單身單筆資料刪除」兩種方式。",
+      "B": "若執行「整張單據刪除」的功能,該單據不得是「已確認」或「已作廢」的單據。",
+      "C": "若執行「單身單筆資料刪除」的功能,可在要刪除的資料上,同時按下「Alt」及 「Del」的按鍵。",
+      "D": "該單據必須是在「修改」的狀態下,才可執行「單身單筆資料刪除」的功能。"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 414,
+    "question": "若要查看由系統產生好的報表,要開啟哪一支作業查看?",
+    "options": {
+      "A": "派班中心",
+      "B": "佇列工作控制台",
+      "C": "按一下主畫面右邊的「流程圖」",
+      "D": "按一下主畫面左邊的「作業清單」"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 415,
+    "question": "在列印報表時以下何者為非?",
+    "options": {
+      "A": "產生的報表要使用者主動去開啟",
+      "B": "產生報表送出去後,等 10 分鐘,報表會自動出現在螢幕上",
+      "C": "產生過的報表,若要再列印一次,不需再重新產生報表",
+      "D": "兩個使用者,同時產生同一張報表,系統會各自執行使用者的需求,不會將兩張報 表合併,只產生一張報表"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 416,
+    "question": "請問報表條件送出後,出現一串數字如:20130226000005,這代表什麼?",
+    "options": {
+      "A": "開啟佇列工作控制台時,該報表的工作代號",
+      "B": "這張報表的單別是 2013,單號是0000005",
+      "C": "號碼是輸入者自己編號的",
+      "D": "號碼只是隨機,無任何意義"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 417,
+    "question": "有關 WF-ERP 作業清單(主畫面左邊的選單)的描述以下何者為非?",
+    "options": {
+      "A": "作業程式名稱如果要修改(重新命名)一定要從程式資料建立作業中修改",
+      "B": "作業清單中各項目之排列順序可以直接用滑鼠拖曳調動",
+      "C": "點選作業的右鍵內容無法看到版本",
+      "D": "作業清單有變更時,離開 WF-ERP 前必須要存檔"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 418,
+    "question": "有關 WF-ERP 系統的登錄畫面,以下哪一個資料未顯示",
+    "options": {
+      "A": "密碼",
+      "B": "使用者",
+      "C": "公司別",
+      "D": "權限群組"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 419,
+    "question": "有關 WF-ERP 使用者,登錄密碼管理的描述何者為是?",
+    "options": {
+      "A": "密碼可試三次,都錯誤了,系統自動關閉",
+      "B": "密碼可分群組控管,主管的權限可涵蓋部門的權限",
+      "C": "密碼設定須設檢查碼",
+      "D": "不同人員的密碼是可以相同的"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 420,
+    "question": "使用者開啟佇列工作台時,有關報表查詢部份那一項欄位資料不提供?",
+    "options": {
+      "A": "處理方式",
+      "B": "預計完成時間",
+      "C": "處理狀態",
+      "D": "工作代號"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 421,
+    "question": "有關產生報表時使用者開啟報表的權限控制以下描述何者為非?",
+    "options": {
+      "A": "可以只設定查詢權限",
+      "B": "可以分別設定列印權限與輸出權限",
+      "C": "沒有輸出權限就不能轉 EXCEL",
+      "D": "報表權限在使用者權限建立作業中設定"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 422,
+    "question": "針對報表開啟後,欄位調整的方式,以下描述何者為正確的?",
+    "options": {
+      "A": "只要能開啟報表,每個人都可以自行調整並存成個人格式",
+      "B": "系統有提供調整後存成登錄者格式的功能,以後即不用再調整",
+      "C": "若能開啟報表,報表開啟後,每人都可轉成 EXCEL 檔,十分方便",
+      "D": "使用者甲所存的報表格式,都可以讓使用者乙、丙一起共用"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 423,
+    "question": "報表開啟後,會出現的狀況何者為非?",
+    "options": {
+      "A": "調整報表欄寬大小時,會出現紅色的線條",
+      "B": "要移動報表欄位時,會出現藍色的標線",
+      "C": "要移動報表欄位時,會出現一隻手的符號,以方便人員移動欄位",
+      "D": "報表開啟後,若無小計欄位者,可以自行設定要小計的方式及欄位"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 424,
+    "question": "在佇列工作控制台中,佇列的排序方式何者為非?",
+    "options": {
+      "A": "依工作代號排序",
+      "B": "依處理方式排序",
+      "C": "依預計完成時間",
+      "D": "依預計處理時間"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 425,
+    "question": "如果要取消存檔可以使用哪種功能鍵?",
+    "options": {
+      "A": "DELETE",
+      "B": "ESC",
+      "C": "F12",
+      "D": "F5"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 426,
+    "question": "查詢資料的操作方式下列何者錯誤?",
+    "options": {
+      "A": "一般選項",
+      "B": "已確認的單據無法查詢",
+      "C": "進階設定",
+      "D": "單身查詢"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 427,
+    "question": "如果我們要查詢單據單身某一筆品項的資料,會使用哪種查詢方式?",
+    "options": {
+      "A": "一般選項查詢",
+      "B": "進階選項查詢",
+      "C": "含單身篩選條件查詢",
+      "D": "設定排序欄位"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 428,
+    "question": "報表轉出檔案的類型下列何者不是?",
+    "options": {
+      "A": "EXCEL",
+      "B": "文字檔",
+      "C": "PPT檔",
+      "D": "HTML格式"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 429,
+    "question": "報表預覽出現哪種表示的欄位才是「顯示明細資料」",
+    "options": {
+      "A": "欄位出現紅色字型",
+      "B": "欄位出現藍色且有底線",
+      "C": "欄位字型較大",
+      "D": "欄位出現星字號"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 430,
+    "question": "報表顯示的數值格式設定負號的方式有幾種?",
+    "options": {
+      "A": "3",
+      "B": "4",
+      "C": "5",
+      "D": "6"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 431,
+    "question": "關於報表畫面的縮放比例下列何者正確?",
+    "options": {
+      "A": "縮放比例的調整會影響列印的紙張大小",
+      "B": "比例調整會影響報表字型大小",
+      "C": "調整比例調整不影響列印出來的大小",
+      "D": "比例調整只影響紙張不影響報表大小"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 432,
+    "question": "要建立進銷貨時的交易幣別,應該先設計哪一支基本資料?",
+    "options": {
+      "A": "進銷存參數",
+      "B": "幣別匯率建立",
+      "C": "交易對象分類建立",
+      "D": "金融機構建立"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 433,
+    "question": "要建立公司員工的職能分類應該要設計在哪裡?",
+    "options": {
+      "A": "職務類別建立",
+      "B": "交易對象分類",
+      "C": "庫別資料建立",
+      "D": "生產線資料建立"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 434,
+    "question": "鼎新ERP系統產生的報表會存放在哪一區?",
+    "options": {
+      "A": "C_PKG",
+      "B": "S_PKG",
+      "C": "S_MODI",
+      "D": "REPORT 區"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 435,
+    "question": "報表的負值的顯示有幾種?",
+    "options": {
+      "A": "3",
+      "B": "4",
+      "C": "5",
+      "D": "6"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 436,
+    "question": "權限設定中售價及成本權限有何分別?",
+    "options": {
+      "A": "售價的權限只有一般及唯讀",
+      "B": "只有成本的權限才有隱藏的設定",
+      "C": "售價及成本皆可以設定成唯讀",
+      "D": "成本的權限只有一般及唯讀"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 437,
+    "question": "有關報表格式以下何者正確?",
+    "options": {
+      "A": "儲存的格式為「公司名稱+使用者代號」",
+      "B": "儲存的格式為「使用者+格式代號」",
+      "C": "若以使用者格式儲存,則不同的使用者登入資料庫皆可使用這個格式",
+      "D": "報表格式只包含使用者格式"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 438,
+    "question": "有關報表功能中的格式儲存、選擇、刪除之敘述,何者錯誤?",
+    "options": {
+      "A": "報表格式可存成個人格式",
+      "B": "報表格式的刪除,需由 MIS 人員方可進行刪除,因為刪除不能隨便做",
+      "C": "報表格式之個人格式可以儲存多組",
+      "D": "若有儲存個人報表格式,選擇報表格式時,除了個人格式外,尚有鼎新預設值(格 式)"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 439,
+    "question": "有關 Workflow ERP 帳號與權限之敘述,何者正確?",
+    "options": {
+      "A": "只要帳號密碼符合,進入系統後便能新增查詢每一支作業",
+      "B": "只要帳號符合,就能登入系統",
+      "C": "若某帳號,可以在A資料區(A公司別)查詢客戶資料,表示在B資料區(B公司別)也可 以查詢客戶資料",
+      "D": "使用者進入系統之後,能不能新增、修改及查詢資料要在使用者權限建立作業中設 定來控管"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 440,
+    "question": "有關Workflow ERP的目錄中,何者是存放Server端的公用元件區?",
+    "options": {
+      "A": "C_data",
+      "B": "S_data",
+      "C": "C_dsbin",
+      "D": "S_dsbin"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 441,
+    "question": "從 Workflow ERP 系統模組 V.S.職務角色而言,下列何組的對應是不適當的?",
+    "options": {
+      "A": "營業稅申報系統 V.S.財會人員",
+      "B": "產品結構管理系統 V.S.MIS 人員",
+      "C": "採購管理系統 V.S.採購人員",
+      "D": "品質管理系統 V.S.品管人員"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 442,
+    "question": "要看剛才執行「訂單銷貨狀況表」報表內容要按工具列上哪一個小圖案,才能進入報 表區?",
+    "options": {
+      "A": "顯示報表工作佇列控制台",
+      "B": "重新登入",
+      "C": "顯示工作管理員",
+      "D": "顯示程式清單"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 443,
+    "question": "產生並開啟報表之步驟有以下幾項 (1)點選要產生的報表作業 (2)開啟報表工作佇列控制台 (3)條件選項設定 (4)開啟已完成報表,其順序何者正確?",
+    "options": {
+      "A": "1234",
+      "B": "1324",
+      "C": "1342",
+      "D": "2341"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 444,
+    "question": "報表上藍色且底下加橫線的欄位為以下何種資料?",
+    "options": {
+      "A": "可下展資料的欄位",
+      "B": "主標題資料",
+      "C": "次標題資料",
+      "D": "頁碼資料"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 445,
+    "question": "交易流程管理中,單據如果未經核准的,應該要作廢,不要刪除單據的主要原因為何?",
+    "options": {
+      "A": "保留資料的完整性,方便將來資料查核",
+      "B": "系統刪除不掉",
+      "C": "因為單據自動編號,如果刪除就不能自動編號了",
+      "D": "沒有刪除的功能"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 446,
+    "question": "以下何者非為電腦的編號原則?",
+    "options": {
+      "A": "編號應反應分類",
+      "B": "編號應採用有意義的編號",
+      "C": "編號應有唯一性",
+      "D": "編號長度應求一致"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 447,
+    "question": "有關 ERP 系統的控制模式,以下何者正確?",
+    "options": {
+      "A": "授權控制是指資料Input/資料切割/資料增修、刪除/Output/資料庫管理",
+      "B": "事後差異分析是指利用程序來控制監督風險",
+      "C": "參數設定是 ERP 系統廠商為了更有彈性的設計 ERP 系統,以因應不同企業管理模 式的需求",
+      "D": "\"在「進貨單建立作業」中,輸入採購單的編號,這樣可輕易找到採購的商品資 料\",此乃為即時警示訊息提醒"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 448,
+    "question": "以下何者不是利用 IT 技術、網路環境、硬體及技術的控管",
+    "options": {
+      "A": "擔心公司研發機密外洩,將研發單位的資訊系統架構成為一個封閉的網絡",
+      "B": "關鍵性 文件的取用須經過多重的授權,或由資料管理中心統一取得",
+      "C": "設定報表印製中心,特定敏感性報表的輸出,必須透過統一收發管理",
+      "D": "ERP系統提出訊息告訴收料者,這筆貨品屬於缺料中的品號"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 449,
+    "question": "MRP物料需求計畫從每日及全體料件的角度來檢視供需平衡,下列何者是屬於需求的 來源?",
+    "options": {
+      "A": "使用單位所申請的\"請購量\"",
+      "B": "客戶已經確認的訂單\"預計出貨量\"",
+      "C": "倉庫中的\"可用庫存量\"",
+      "D": "製令的\"預計入庫 量\""
+    },
+    "answer": "B"
+  },
+  {
+    "id": 450,
+    "question": "\"當客戶要買台汽車時,如果有些配備要讓客戶自行挑選時,就可以透過訂單選擇增 訂\",這樣的情況會造成 MRP 計畫執行時的何種困擾?",
+    "options": {
+      "A": "製造生產的前置時間 (Lead time) 彈性過大",
+      "B": "客製化之 BOM 特性及替代件對 MRP 計畫的衝擊",
+      "C": "多樣少量的短交期訂單衝擊製造生產",
+      "D": "庫存帳務即時及正確性不佳",
+      "E": "其英文全名為 Lot Requirement Planning System"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 451,
+    "question": "\"企業可以從已接訂單的記錄進行分析,例如:美東訂單增加10%,東歐訂單增加 15%,東南亞訂單減少 5%,透過這些及時資訊快速的調整行銷活動,以因應市場經 營,創造更多的營收及獲利\"的資訊系統使用階段為下列何者?",
+    "options": {
+      "A": "MRPII階段",
+      "B": "ERP 階段",
+      "C": "ERPII階段",
+      "D": "RTE階段"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 452,
+    "question": "\"將企業分散各地所有相關資訊,包含內部 ERP、SCM、CRM 及外部資訊等,系統性 的彙總,透由 ETL (Extract, Transfer, Load) 的工具或程序,有效萃取、轉化成有用 資訊,作為企業判斷、決策與行動基礎,適時修正現有策略與流 程以提升企業競爭優 勢\" 的系統為下列何者?",
+    "options": {
+      "A": "MES系統",
+      "B": "BI系統",
+      "C": "SCM系統",
+      "D": "CRM系統"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 453,
+    "question": "\"以採購單跟進貨單之程序控制而言,就必預先於單據性質設定作業中,限定進貨單一 定要【核對採購】,然後 在『進貨單建立作業』中,單身再加入進行程序控制的功 能”這樣的控制模式為以下何種?",
+    "options": {
+      "A": "授權控制",
+      "B": "參數設定",
+      "C": "程序管制",
+      "D": "資料控管"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 454,
+    "question": "列印「廠商進貨異常表」及『採購價格異常表』為ERP系統的哪一種控制模式?",
+    "options": {
+      "A": "資料調節控制",
+      "B": "事後差異分析",
+      "C": "程序管制",
+      "D": "資料控管"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 455,
+    "question": "\"訂單處理、授信管理、運送貨品或提供勞務、開立銷貨發票及帳單、記錄收入及應收 帳款、銷貨折讓及銷貨退回等程序\"是下列何種交易循環類型?",
+    "options": {
+      "A": "銷售及收款循環",
+      "B": "採購及付款循環",
+      "C": "薪工循環",
+      "D": "其他循環"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 456,
+    "question": "下列何者不是 ERP 系統導入不能成功的主要原因之一?",
+    "options": {
+      "A": "經營者或高階主管之決心及支持度不佳",
+      "B": "基本資料及期初餘額過於繁雜,準備不及",
+      "C": "專案規劃及執行效率不佳",
+      "D": "ERP基本資料之規劃不良"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 457,
+    "question": "在ERP導入的哪一階段,「甘特圖」進度表是非常關鍵性的產出文件,其主要定義每 一導入階段之工作重點與權責單位?",
+    "options": {
+      "A": "專案計畫階段",
+      "B": "教育訓練階段",
+      "C": "作業流程擬定階段",
+      "D": "正式上線及效益評估階段"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 458,
+    "question": "在 ERP 導入的哪一階段,要開始收集基本資料,如客戶資料?",
+    "options": {
+      "A": "專案計畫階段",
+      "B": "教育訓練階段",
+      "C": "作業流程擬定階段",
+      "D": "正式上線及效益評估階段"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 459,
+    "question": "關於輸出及轉出檔案權限,以下敘述何者錯誤?",
+    "options": {
+      "A": "兩者權限可分開設定",
+      "B": "轉出檔可為Excel",
+      "C": "輸出是指可不可以列印的權限",
+      "D": "可以輸出報表就可以轉出檔案"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 460,
+    "question": "129.5/1 進貨100件 不良品2件、5/3 進貨200件 不良品0件、5/7 進貨200件 不良品2 件、5/12 進貨300件 不良品 0 件、5/19 進貨 200 件 不良品 0 件,請問不良率為多 少?",
+    "options": {
+      "A": "0.20%",
+      "B": "0.4%",
+      "C": "2%",
+      "D": "4%"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 461,
+    "question": "用於向特定廠商進行採購,則可在此欄位輸入供應商代號,產生向指定廠商採買之請 購單或採購單,請問是以下何種欄位?",
+    "options": {
+      "A": "請採購廠商",
+      "B": "客戶代號",
+      "C": "廠商代號",
+      "D": "以上皆非"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 462,
+    "question": "對於報價單建立下列何者有誤?",
+    "options": {
+      "A": "輸入客戶代號會依設定自動帶出交易幣別",
+      "B": "報價單單身的生效日不可以空白",
+      "C": "已確認的報價單可以轉為客戶訂單或銷貨單",
+      "D": "已確認的報價單還要執行客戶確認才可以轉為客戶訂單或銷貨單"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 463,
+    "question": "可用來查詢客戶一段時間內,銷貨明細資料狀況的報表,是下列哪張報表?",
+    "options": {
+      "A": "訂單預計出貨明細表",
+      "B": "歷史交易紀錄表",
+      "C": "客戶銷貨明細表",
+      "D": "客戶銷售統計表"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 464,
+    "question": "盤點底稿盤點數量輸入或檢視無誤後,要進行什麼動作,之後帳面數量便會出現?",
+    "options": {
+      "A": "彙總",
+      "B": "存檔",
+      "C": "鎖定",
+      "D": "判定"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 465,
+    "question": "「製令預計進貨表」是依何種角度查詢預計進貨資料?",
+    "options": {
+      "A": "製令",
+      "B": "品號",
+      "C": "廠商",
+      "D": "客戶"
+    },
+    "answer": "A"
+  },
+  {
+    "id": 466,
+    "question": "\"能夠通過使用最新資訊,在關鍵商務流程中消除管理和實施中的延遲,從而提高競爭 力的企業\"的資訊系統使 用階段為下列何者? (參考第 120 題)",
+    "options": {
+      "A": "MRPII階段",
+      "B": "ERP階段",
+      "C": "ERPII階段",
+      "D": "RTE階段"
+    },
+    "answer": "D"
+  },
+  {
+    "id": 467,
+    "question": "有關 erp 導入流程,以下何者為是? (1)專案計畫階段 (2)作業流程擬定階段 (3)教育訓練階段 (4)正式上線及效益評估階段",
+    "options": {
+      "A": "1234",
+      "B": "1324",
+      "C": "1342",
+      "D": "2341"
+    },
+    "answer": "B"
+  }
+];
+    const STORAGE_KEY = "erpQuizProgress.v1";
+    const PAGE_SIZE = 10;
+    const MASTER_STREAK = 3;
+
+    let selectedMode = "random";
+    let currentExam = null;
+    let currentPage = 0;
+    let lastResult = null;
+    let resultWrongOnly = false;
+
+    const $ = (id) => document.getElementById(id);
+
+    function defaultStore() {
+      return {
+        totalAnswered: 0,
+        totalCorrect: 0,
+        lastScore: null,
+        progress: {}
+      };
+    }
+
+    function loadStore() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultStore();
+        const parsed = JSON.parse(raw);
+        return {
+          ...defaultStore(),
+          ...parsed,
+          progress: parsed.progress || {}
+        };
+      } catch (error) {
+        return defaultStore();
+      }
+    }
+
+    function saveStore(store) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    }
+
+    function getProgress(store, id) {
+      const key = String(id);
+      if (!store.progress[key]) {
+        store.progress[key] = { attempts: 0, correct: 0, wrongEver: false, correctStreak: 0 };
+      }
+      return store.progress[key];
+    }
+
+    function isMastered(store, id) {
+      return (store.progress[String(id)]?.correctStreak || 0) >= MASTER_STREAK;
+    }
+
+    function eligibleQuestions(store) {
+      return QUESTIONS.filter(q => !isMastered(store, q.id));
+    }
+
+    function pct(n, d) {
+      if (!d) return "0%";
+      return Math.round((n / d) * 100) + "%";
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "尚未測驗";
+      const d = new Date(iso);
+      return d.toLocaleString("zh-TW", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+    }
+
+    function renderDashboard() {
+      const store = loadStore();
+      const mastered = QUESTIONS.filter(q => isMastered(store, q.id)).length;
+      const remaining = QUESTIONS.length - mastered;
+      const wrongCount = QUESTIONS.filter(q => {
+        const p = store.progress[String(q.id)];
+        return p && p.wrongEver && (p.correctStreak || 0) < MASTER_STREAK;
+      }).length;
+
+      $("dashboard").innerHTML = [
+        statCard("總題數", QUESTIONS.length, "PDF 題庫已匯入"),
+        statCard("已作答題數", store.totalAnswered, "包含重複練習"),
+        statCard("答對率", pct(store.totalCorrect, store.totalAnswered), `${store.totalCorrect} / ${store.totalAnswered || 0}`),
+        statCard("目前錯題數", wrongCount, "曾答錯且尚未掌握"),
+        statCard("已掌握題數", mastered, `連續答對 ${MASTER_STREAK} 次`),
+        statCard("最近一次成績", store.lastScore ? `${store.lastScore.score} / ${store.lastScore.total}` : "—", store.lastScore ? `${store.lastScore.percent} · ${formatDate(store.lastScore.date)}` : "尚未測驗")
+      ].join("");
+
+      $("remainingHint").textContent = `剩餘未掌握 ${remaining} 題`;
+      const allBtn = $("allRemainingBtn");
+      allBtn.textContent = `全部可練習（${remaining}）`;
+    }
+
+    function statCard(label, value, hint) {
+      return `<div class="stat panel">
+        <div class="label">${escapeHtml(label)}</div>
+        <div>
+          <div class="value">${escapeHtml(String(value))}</div>
+          <div class="hint">${escapeHtml(String(hint))}</div>
+        </div>
+      </div>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function setView(view) {
+      $("homeView").classList.toggle("hidden", view !== "home");
+      $("quizView").classList.toggle("hidden", view !== "quiz");
+      $("resultView").classList.toggle("hidden", view !== "result");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function modeLabel(mode) {
+      if (mode === "random") return "隨機抽題";
+      if (mode === "order") return "依題號順序";
+      if (mode === "range") return "指定題號區間";
+      return "測驗";
+    }
+
+    function updateModeUI() {
+      const isRange = selectedMode === "range";
+      const rangePanel = $("rangePanel");
+      if (rangePanel) rangePanel.classList.toggle("hidden", !isRange);
+      const countNote = $("countNote");
+      if (countNote) {
+        countNote.textContent = isRange
+          ? "指定題號區間會忽略本次題數，直接使用你輸入的範圍。"
+          : "每 10 題顯示一頁；交卷後才會顯示答案。";
+      }
+    }
+
+    function parseQuestionRange(raw) {
+      const text = String(raw || "").trim();
+      const match = text.match(/^(\d+)\s*-\s*(\d+)$/);
+      if (!match) return null;
+      let start = Number(match[1]);
+      let end = Number(match[2]);
+      if (!Number.isInteger(start) || !Number.isInteger(end)) return null;
+      if (start <= 0 || end <= 0) return null;
+      if (start > end) [start, end] = [end, start];
+      return { start, end };
+    }
+
+    function startQuiz() {
+      const store = loadStore();
+      let picked = [];
+
+      if (selectedMode === "range") {
+        const parsed = parseQuestionRange($("questionRange").value);
+        if (!parsed) {
+          alert("請輸入指定題號區間，例如：1-10");
+          return;
+        }
+        picked = QUESTIONS
+          .filter(q => q.id >= parsed.start && q.id <= parsed.end)
+          .sort((a, b) => a.id - b.id);
+        if (picked.length === 0) {
+          alert(`找不到題號 ${parsed.start}-${parsed.end} 的題目。`);
+          return;
+        }
+      } else {
+        const pool = eligibleQuestions(store);
+        if (pool.length === 0) {
+          alert("你已經把全部題目都連續答對 3 次了！想重新練習的話，可以按「重置全部進度」，或使用「指定題號區間」練已掌握題目。");
+          return;
+        }
+
+        let count = parseInt($("questionCount").value, 10);
+        if (!Number.isFinite(count) || count <= 0) count = 30;
+        count = Math.min(count, pool.length);
+
+        picked = selectedMode === "random"
+          ? shuffle(pool).slice(0, count)
+          : [...pool].sort((a, b) => a.id - b.id).slice(0, count);
+      }
+
+      currentExam = {
+        mode: selectedMode,
+        questions: picked,
+        answers: {},
+        startedAt: new Date().toISOString()
+      };
+      currentPage = 0;
+      $("missingBox").classList.add("hidden");
+      setView("quiz");
+      renderQuiz();
+    }
+
+    function renderQuiz() {
+      if (!currentExam) return;
+      const total = currentExam.questions.length;
+      const pageCount = Math.ceil(total / PAGE_SIZE);
+      const start = currentPage * PAGE_SIZE;
+      const pageQuestions = currentExam.questions.slice(start, start + PAGE_SIZE);
+      const answeredCount = Object.keys(currentExam.answers).length;
+
+      $("quizTitle").textContent = modeLabel(currentExam.mode);
+      $("quizMeta").textContent = `本次 ${total} 題 · 已作答 ${answeredCount} 題 · 第 ${currentPage + 1} / ${pageCount} 頁`;
+      $("pageInfo").textContent = `目前顯示第 ${start + 1}–${Math.min(start + PAGE_SIZE, total)} 題`;
+      $("prevPageBtn").disabled = currentPage === 0;
+      $("nextPageBtn").disabled = currentPage >= pageCount - 1;
+
+      $("pageDots").innerHTML = Array.from({ length: pageCount }, (_, idx) => {
+        return `<button class="page-dot ${idx === currentPage ? "active" : ""}" type="button" data-page="${idx}">${idx + 1}</button>`;
+      }).join("");
+
+      $("questionsContainer").innerHTML = pageQuestions.map((q, idx) => renderQuestion(q, start + idx)).join("");
+
+      document.querySelectorAll(".page-dot").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentPage = Number(btn.dataset.page);
+          $("missingBox").classList.add("hidden");
+          renderQuiz();
+        });
+      });
+
+      document.querySelectorAll("[data-answer]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const qid = btn.dataset.qid;
+          const answer = btn.dataset.answer;
+          currentExam.answers[qid] = answer;
+          renderQuiz();
+        });
+      });
+    }
+
+    function renderQuestion(q, index) {
+      const selected = currentExam.answers[String(q.id)];
+      const options = Object.entries(q.options).map(([key, text]) => {
+        const isSelected = selected === key;
+        return `<button class="option ${isSelected ? "selected" : ""}" type="button" data-qid="${q.id}" data-answer="${key}">
+          <span class="option-key">${escapeHtml(key)}</span>
+          <span class="option-text">${escapeHtml(text)}</span>
+        </button>`;
+      }).join("");
+
+      return `<article class="question-card" id="q-${q.id}">
+        <div class="q-head">
+          <span>本次第 ${index + 1} 題</span>
+          <span>原題號 ${q.id}</span>
+        </div>
+        <div class="q-title">${escapeHtml(q.question)}</div>
+        <div class="options">${options}</div>
+      </article>`;
+    }
+
+    function goPage(delta) {
+      if (!currentExam) return;
+      const pageCount = Math.ceil(currentExam.questions.length / PAGE_SIZE);
+      currentPage = Math.max(0, Math.min(pageCount - 1, currentPage + delta));
+      $("missingBox").classList.add("hidden");
+      renderQuiz();
+    }
+
+    function submitQuiz(force = false) {
+      if (!currentExam) return;
+      const missing = currentExam.questions.filter(q => !currentExam.answers[String(q.id)]);
+      if (missing.length && !force) {
+        showMissing(missing);
+        return;
+      }
+      gradeQuiz();
+    }
+
+    function showMissing(missing) {
+      $("missingBox").classList.remove("hidden");
+      $("missingList").innerHTML = missing.map(q => `<button class="mini-btn" type="button" data-jump="${q.id}">題號 ${q.id}</button>`).join("");
+      document.querySelectorAll("[data-jump]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const qid = Number(btn.dataset.jump);
+          const idx = currentExam.questions.findIndex(q => q.id === qid);
+          currentPage = Math.floor(idx / PAGE_SIZE);
+          renderQuiz();
+          setTimeout(() => {
+            const target = document.getElementById(`q-${qid}`);
+            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 60);
+        });
+      });
+      $("missingBox").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function gradeQuiz() {
+      const store = loadStore();
+      const details = currentExam.questions.map(q => {
+        const userAnswer = currentExam.answers[String(q.id)] || "";
+        const correct = userAnswer === q.answer;
+        const p = getProgress(store, q.id);
+        p.attempts += 1;
+        store.totalAnswered += 1;
+        if (correct) {
+          p.correct += 1;
+          p.correctStreak = (p.correctStreak || 0) + 1;
+          store.totalCorrect += 1;
+        } else {
+          p.wrongEver = true;
+          p.correctStreak = 0;
+        }
+        return {
+          question: q,
+          userAnswer,
+          correct,
+          updatedStreak: p.correctStreak || 0,
+          mastered: (p.correctStreak || 0) >= MASTER_STREAK
+        };
+      });
+
+      const score = details.filter(d => d.correct).length;
+      const total = details.length;
+      const percentNum = total ? Math.round((score / total) * 100) : 0;
+      store.lastScore = {
+        score,
+        total,
+        percent: `${percentNum}%`,
+        date: new Date().toISOString()
+      };
+      saveStore(store);
+
+      lastResult = {
+        mode: currentExam.mode,
+        details,
+        score,
+        total,
+        percent: percentNum,
+        date: store.lastScore.date
+      };
+      resultWrongOnly = false;
+      currentExam = null;
+      setView("result");
+      renderResult();
+    }
+
+    function renderResult() {
+      if (!lastResult) return;
+      const wrong = lastResult.details.filter(d => !d.correct);
+      $("resultDate").textContent = `${modeLabel(lastResult.mode)} · ${formatDate(lastResult.date)}`;
+      $("resultSummary").innerHTML = [
+        resultStat("分數", `${lastResult.score} / ${lastResult.total}`),
+        resultStat("答對率", `${lastResult.percent}%`),
+        resultStat("本次錯題", wrong.length),
+        resultStat("新掌握題", lastResult.details.filter(d => d.mastered && d.correct).length)
+      ].join("");
+
+      $("toggleWrongBtn").textContent = resultWrongOnly ? "顯示全部題目" : "只顯示本次錯題";
+
+      const list = resultWrongOnly ? wrong : lastResult.details;
+      if (list.length === 0) {
+        $("resultList").innerHTML = `<div class="empty-state">這次沒有錯題，好棒！</div>`;
+        return;
+      }
+
+      $("resultList").innerHTML = list.map(renderResultItem).join("");
+    }
+
+    function resultStat(label, value) {
+      return `<div class="result-card">
+        <div class="label">${escapeHtml(label)}</div>
+        <div class="value">${escapeHtml(String(value))}</div>
+      </div>`;
+    }
+
+    function renderResultItem(detail) {
+      const q = detail.question;
+      const options = Object.entries(q.options).map(([key, text]) => {
+        const isCorrect = key === q.answer;
+        const isUserWrong = key === detail.userAnswer && !detail.correct;
+        const tag = isCorrect ? `<span class="badge ok">正解</span>` : (isUserWrong ? `<span class="badge bad">你的答案</span>` : "");
+        return `<div class="result-option ${isCorrect ? "is-correct" : ""} ${isUserWrong ? "is-user-wrong" : ""}">
+          <span class="option-key">${escapeHtml(key)}</span>
+          <span>${escapeHtml(text)}</span>
+          ${tag}
+        </div>`;
+      }).join("");
+
+      return `<article class="result-item ${detail.correct ? "correct" : "wrong"}">
+        <div class="q-head">
+          <span>原題號 ${q.id}</span>
+          <span class="badge ${detail.correct ? "ok" : "bad"}">${detail.correct ? "答對" : "答錯"}</span>
+        </div>
+        <div class="q-title">${escapeHtml(q.question)}</div>
+        <div>${options}</div>
+        <div class="answer-line">
+          <span>你的答案：<strong>${detail.userAnswer ? escapeHtml(detail.userAnswer) : "未作答"}</strong></span>
+          <span>正確答案：<strong>${escapeHtml(q.answer)}</strong></span>
+          <span>連續答對：<strong>${detail.updatedStreak} / ${MASTER_STREAK}</strong></span>
+          ${detail.mastered ? '<span class="badge ok">已掌握，之後不再出現</span>' : ''}
+        </div>
+      </article>`;
+    }
+
+    function resetAll() {
+      const ok = confirm("確定要重置全部進度嗎？答題紀錄、答對率、錯題狀態、已掌握題目都會清空。");
+      if (!ok) return;
+      localStorage.removeItem(STORAGE_KEY);
+      currentExam = null;
+      lastResult = null;
+      resultWrongOnly = false;
+      setView("home");
+      renderDashboard();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderDashboard();
+
+      document.querySelectorAll(".choice-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedMode = btn.dataset.mode;
+          document.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          updateModeUI();
+        });
+      });
+      updateModeUI();
+
+      document.querySelectorAll("[data-count]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          $("questionCount").value = btn.dataset.count;
+        });
+      });
+
+      $("allRemainingBtn").addEventListener("click", () => {
+        $("questionCount").value = eligibleQuestions(loadStore()).length;
+      });
+
+      $("startBtn").addEventListener("click", startQuiz);
+      $("resetBtn").addEventListener("click", resetAll);
+      $("prevPageBtn").addEventListener("click", () => goPage(-1));
+      $("nextPageBtn").addEventListener("click", () => goPage(1));
+      $("submitBtn").addEventListener("click", () => submitQuiz(false));
+      $("forceSubmitBtn").addEventListener("click", () => submitQuiz(true));
+      $("hideMissingBtn").addEventListener("click", () => $("missingBox").classList.add("hidden"));
+
+      $("quitBtn").addEventListener("click", () => {
+        const ok = confirm("確定要返回首頁嗎？這次尚未交卷的答案不會保存。");
+        if (!ok) return;
+        currentExam = null;
+        setView("home");
+        renderDashboard();
+      });
+
+      $("backHomeBtn").addEventListener("click", () => {
+        setView("home");
+        renderDashboard();
+      });
+
+      $("toggleWrongBtn").addEventListener("click", () => {
+        resultWrongOnly = !resultWrongOnly;
+        renderResult();
+      });
+
+      $("restartSameModeBtn").addEventListener("click", () => {
+        selectedMode = lastResult?.mode || selectedMode;
+        document.querySelectorAll(".choice-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === selectedMode));
+        updateModeUI();
+        setView("home");
+        renderDashboard();
+        setTimeout(startQuiz, 80);
+      });
+    });
+  </script>
+</body>
+</html>
